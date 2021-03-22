@@ -1,0 +1,9 @@
+# Ignore the following
+Thumbs.db
+.DS_Store
+wp-config.php
+.htaccess
+wp-content/uploads
+node_modules
+dist
+.cache
