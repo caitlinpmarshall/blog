@@ -1,0 +1,50 @@
+/*
+ Theme Name:   Astra Child
+ Theme URI:	http://example.com/astra-child
+ Description:  Astra Child Theme -- just a few tweaks.
+ Author:   	Caitlin Marshall
+ Author URI:   https://www.caitlinpmarshall.com
+ Template: 	astra
+ Version:  	1.0.0
+ License:  	GNU General Public License v2 or later
+ License URI:  http://www.gnu.org/licenses/gpl-2.0.html
+ Tags:     	astra
+ Text Domain:  astrachild
+*/
+
+/* Global Styles */
+
+.ast-separate-container {
+    background-color: #fff;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+a, .page-links .page-link, .single .post-navigation a, .entry-meta * {
+    color: #028090;
+}
+
+.menu-toggle, button, .ast-button, .ast-custom-button, .button, input#submit, input[type="button"], input[type="submit"], input[type="reset"] {
+    background-color: #028090;
+    border-color: #028090;
+}
+
+.site-below-footer-wrap[data-section="section-below-footer-builder"] {
+    background-color: #fff;
+    min-height: 80px;
+    border-top: 2px solid #028090;
+}
+
+/* Contact Page Styles */
+input[type=email], input[type=number], input[type=password], input[type=reset], input[type=search], input[type=tel], input[type=text], input[type=url], select, textarea {
+    margin: 1em 0;
+}
+
+/*
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Libre Baskerville', serif;
+}
+*/
+

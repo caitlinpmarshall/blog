@@ -1,0 +1,62 @@
+@charset "utf-8";
+/* Styles for the Customizer */
+
+.disabled-exp {
+	color: #333;
+    background: #FAFBC1;
+}
+
+#customize-controls .customize-control .description {
+	color: #999;
+}
+
+.bnt-customizer-link {
+	width: 100%;
+	display:block;
+	padding: 9px 15px;
+	box-sizing: border-box;
+	position: relative;
+	border-top: 1px solid #ddd;
+    text-decoration: none;
+}
+
+.bnt-customizer-link:hover {
+	background-color: #ddd
+}
+
+.bnt-customizer-link .dashicons {
+	font-size: 18px;
+	margin-right: 10px;
+}
+
+.bnt-customizer-link:after {
+	content: "›";
+	position: absolute;
+	top: -2px;
+	right: 0;
+	padding: 9px 15px;
+	line-height: 20px;
+	font-size: 20px;
+}
+
+.bnt-ep-link {
+	border-top: none;
+	color: #de811f;
+}
+
+.bnt-customizer-ep-active .bnt-ep-link {
+	display: none;
+}
+
+.bnt-customizer-ep-active .bnt-rate-link {
+	border-top: none;
+}
+
+#accordion-section-bento_theme_support .accordion-section-title {
+	font-style: italic;
+	color: #0073aa;
+}
+
+#customize-controls #accordion-section-bento_theme_support .accordion-section-title:hover {
+	color: #de811f;
+}
