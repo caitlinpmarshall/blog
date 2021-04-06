@@ -504,7 +504,7 @@ function astra_builder_widget_css( builder_type = 'header' ) {
 			builder_type + '-widget-' + index + '-color',
 			'astra-settings[' + builder_type + '-widget-' + index + '-color]',
 			'color',
-			selector + ' .' + builder_type + '-widget-area-inner'
+			 ( AstraBuilderWidgetData.is_flex_based_css ) ? selector + '.' + builder_type + '-widget-area-inner' : selector + ' .' + builder_type + '-widget-area-inner'
 		);
 
 		// Widget Link Color.
@@ -512,7 +512,7 @@ function astra_builder_widget_css( builder_type = 'header' ) {
 			builder_type + '-widget-' + index + '-link-color',
 			'astra-settings[' + builder_type + '-widget-' + index + '-link-color]',
 			'color',
-			selector + ' .' + builder_type + '-widget-area-inner a'
+			( AstraBuilderWidgetData.is_flex_based_css ) ? selector + '.' + builder_type + '-widget-area-inner a' : selector + ' .' + builder_type + '-widget-area-inner a'
 		);
 
 		// Widget Link Hover Color.
@@ -520,7 +520,7 @@ function astra_builder_widget_css( builder_type = 'header' ) {
 			builder_type + '-widget-' + index + '-link-h-color',
 			'astra-settings[' + builder_type + '-widget-' + index + '-link-h-color]',
 			'color',
-			selector + ' .' + builder_type + '-widget-area-inner a:hover'
+			( AstraBuilderWidgetData.is_flex_based_css ) ? selector + '.' + builder_type + '-widget-area-inner a:hover' : selector + ' .' + builder_type + '-widget-area-inner a:hover'
 		);
 
 		// Widget Title Color.
@@ -540,7 +540,7 @@ function astra_builder_widget_css( builder_type = 'header' ) {
 		// Widget Content Typography.
 		astra_responsive_font_size(
 			'astra-settings[' + builder_type + '-widget-' + index + '-content-font-size]',
-			selector + ' .' + builder_type + '-widget-area-inner'
+			( AstraBuilderWidgetData.is_flex_based_css ) ? selector + '.' + builder_type + '-widget-area-inner' : selector + ' .' + builder_type + '-widget-area-inner'
 		);
 
 		// Advanced Visibility CSS Generation.
@@ -591,18 +591,30 @@ function astra_builder_widget_css( builder_type = 'header' ) {
 					value.bind( function( alignment ) {
 						if( alignment.desktop != '' || alignment.tablet != '' || alignment.mobile != '' ) {
 							var dynamicStyle = '';
-							dynamicStyle += '.footer-widget-area[data-section="sidebar-widgets-footer-widget-' + index + '"] .footer-widget-area-inner {';
+							if( AstraBuilderWidgetData.is_flex_based_css ){
+								dynamicStyle += '.footer-widget-area[data-section="sidebar-widgets-footer-widget-' + index + '"].footer-widget-area-inner {';
+							}else{
+								dynamicStyle += '.footer-widget-area[data-section="sidebar-widgets-footer-widget-' + index + '"] .footer-widget-area-inner {';
+							}
 							dynamicStyle += 'text-align: ' + alignment['desktop'] + ';';
 							dynamicStyle += '} ';
 
 							dynamicStyle +=  '@media (max-width: ' + tablet_break_point + 'px) {';
-							dynamicStyle += '.footer-widget-area[data-section="sidebar-widgets-footer-widget-' + index + '"] .footer-widget-area-inner {';
+							if( AstraBuilderWidgetData.is_flex_based_css ){
+								dynamicStyle += '.footer-widget-area[data-section="sidebar-widgets-footer-widget-' + index + '"].footer-widget-area-inner {'; 
+							}else{
+								dynamicStyle += '.footer-widget-area[data-section="sidebar-widgets-footer-widget-' + index + '"] .footer-widget-area-inner {'; 
+							}
 							dynamicStyle += 'text-align: ' + alignment['tablet'] + ';';
 							dynamicStyle += '} ';
 							dynamicStyle += '} ';
 
 							dynamicStyle +=  '@media (max-width: ' + mobile_break_point + 'px) {';
-							dynamicStyle += '.footer-widget-area[data-section="sidebar-widgets-footer-widget-' + index + '"] .footer-widget-area-inner {';
+							if( AstraBuilderWidgetData.is_flex_based_css ){
+								dynamicStyle += '.footer-widget-area[data-section="sidebar-widgets-footer-widget-' + index + '"].footer-widget-area-inner {';
+							}else{
+								dynamicStyle += '.footer-widget-area[data-section="sidebar-widgets-footer-widget-' + index + '"] .footer-widget-area-inner {';
+							}
 							dynamicStyle += 'text-align: ' + alignment['mobile'] + ';';
 							dynamicStyle += '} ';
 							dynamicStyle += '} ';

@@ -109,7 +109,7 @@ if ( ! class_exists( 'Astra_Mobile_Header' ) ) :
 					'aria-expanded' => 'false',
 				),
 				$item
-			) . '><span class="screen-reader-text">' . __( 'Menu Toggle', 'astra' ) . '</span></button>';
+			) . '><span class="screen-reader-text">' . __( 'Menu Toggle', 'astra' ) . '</span>' . Astra_Icons::get_icons( 'arrow' ) . '</button>';
 
 			return $item_output;
 		}

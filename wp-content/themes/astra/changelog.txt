@@ -1,3 +1,27 @@
+v3.3.0
+- New: Transparent Header - WooCommerce Cart & EDD Cart icon color options.
+- New: Builder - Off-Canvas - Added spacing option for Off-Canvas.
+- New: SVG Icons support ( deprecating astra.woff font file ). (https://wpastra.com/docs/ast-font-icons-to-svg/)
+- Improvement: Builder - Mobile Menu - Renamed Mobile Menu to Off-Canvas Menu.
+- Improvement: Builder - Added instructive message in the builder side panel when builder layout does not have any element in use.
+- Improvement: Replaced responsive number control with a responsive slider control for Base Font Size in Typography section.
+- Improvement: Gutenberg Editor - Block patterns compatibility. (https://wpastra.com/docs/fix-spacing-gb-blocks/)
+- Improvement: Compatibility with WordPress 5.7.
+- Improvement: Code quality improvements for better performance.
+- Improvement: Load minified customizer preview files for better performance.
+- Improvement: Frontend optimization - Comments, Pagination, Single Page, Single Post, Archive Page. (https://wpastra.com/docs/optimize-css-html-before-3-3/)
+- Improvement: Frontend optimization - WooCommerce - Shop Page, Single Product Page.
+- Improvement: Frontend optimization - EDD - Shop Page, Single Product Page.
+- Improvement: Frontend optimization - LifterLMS - All Courses Page.
+- Improvement: Frontend optimization - LearnDash - All Courses Page, Single Course Page.
+- Fix: White Label – White-labeled the Astra Header Footer setting notice.
+- Fix: WooCommerce - Single Product page - Save review form fields cookies consent is misaligned.
+- Fix: Builder - Off-Canvas - Close submenu toggle icon not changing in Mobile Menu element when the submenu is in the expanded state.
+- Fix: Builder - Header - Frontend grid layout overlaps on the content section when multiple elements added in the same header layout.
+- Fix: Builder - Footer - Customizer's 2nd column stack layout SVG is missing in footer layouts for responsive devices.
+- Fix: Builder - Footer - Responsive control for layouts gets hidden with the click of WordPress default responsive controls.
+- Fix: Block Editor - Code Block spacing CSS tweaks when it is left aligned.
+
 v3.2.0
 - New: Support for the Web Stories plugin by Google - Show off your web stories in the header of your website.
 - Fix: Transparent Header - Submenu background alpha not working for the old header.
@@ -27,7 +51,7 @@ v3.1.0
 - Improvement: Builder - Social Icons - Added a color option for labels of social icons.
 - Improvement: Builder - Off-Canvas - Added an option to manage spacing between inner elements of the Off-Canvas.
 - Improvement: Added new Page meta options for Above, Below and Mobile header.
-- Fix: Footer vertical alignment option not not working.
+- Fix: Footer vertical alignment option not working.
 - Fix: Above Footer & Below Footer showing up an unwanted border in the customizer preview.
 - Fix: Updated Learn More Links on Astra Options page for Nav Menu & Easy Digital Downloads addon.
 - Fix: Overflowing content not wrapping as per grid layout on responsive device for Header Footer builder layout.

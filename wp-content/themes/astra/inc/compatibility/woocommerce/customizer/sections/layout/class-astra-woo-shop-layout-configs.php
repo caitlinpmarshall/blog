@@ -41,10 +41,13 @@ if ( ! class_exists( 'Astra_Woo_Shop_Layout_Configs' ) ) {
 					'control'           => 'ast-responsive-slider',
 					'sanitize_callback' => array( 'Astra_Customizer_Sanitizes', 'sanitize_responsive_slider' ),
 					'section'           => 'woocommerce_product_catalog',
-					'default'           => array(
-						'desktop' => 4,
-						'tablet'  => 3,
-						'mobile'  => 2,
+					'default'           => astra_get_option(
+						'shop-grids',
+						array(
+							'desktop' => 4,
+							'tablet'  => 3,
+							'mobile'  => 2,
+						) 
 					),
 					'priority'          => 11,
 					'title'             => __( 'Shop Columns', 'astra' ),
@@ -85,6 +88,7 @@ if ( ! class_exists( 'Astra_Woo_Shop_Layout_Configs' ) ) {
 					'default'           => astra_get_option( 'shop-product-structure' ),
 					'priority'          => 15,
 					'title'             => __( 'Shop Product Structure', 'astra' ),
+					'divider'           => array( 'ast_class' => 'ast-bottom-divider' ),
 					'choices'           => array(
 						'title'      => __( 'Title', 'astra' ),
 						'price'      => __( 'Price', 'astra' ),
@@ -101,7 +105,7 @@ if ( ! class_exists( 'Astra_Woo_Shop_Layout_Configs' ) ) {
 				array(
 					'name'     => ASTRA_THEME_SETTINGS . '[shop-archive-width]',
 					'type'     => 'control',
-					'control'  => 'select',
+					'control'  => 'ast-select',
 					'section'  => 'woocommerce_product_catalog',
 					'default'  => astra_get_option( 'shop-archive-width' ),
 					'priority' => 10,
@@ -110,6 +114,7 @@ if ( ! class_exists( 'Astra_Woo_Shop_Layout_Configs' ) ) {
 						'default' => __( 'Default', 'astra' ),
 						'custom'  => __( 'Custom', 'astra' ),
 					),
+					'divider'  => array( 'ast_class' => 'ast-bottom-divider' ),
 				),
 
 				/**
@@ -130,6 +135,7 @@ if ( ! class_exists( 'Astra_Woo_Shop_Layout_Configs' ) ) {
 						'step' => 1,
 						'max'  => 1920,
 					),
+					'divider'     => array( 'ast_class' => 'ast-bottom-divider' ),
 					'context'     => array(
 						Astra_Builder_Helper::$general_tab_config,
 						array(
@@ -138,18 +144,6 @@ if ( ! class_exists( 'Astra_Woo_Shop_Layout_Configs' ) ) {
 							'value'    => 'custom',
 						),
 					),
-				),
-
-				/**
-				 * Option: Divider
-				 */
-				array(
-					'name'     => ASTRA_THEME_SETTINGS . '[shop-archive-layout-divider]',
-					'type'     => 'control',
-					'section'  => 'woocommerce_product_catalog',
-					'control'  => 'ast-divider',
-					'priority' => 10,
-					'settings' => array(),
 				),
 			);
 

@@ -53,19 +53,6 @@ final class Astra_Builder_Base_Configuration {
 		return array(
 
 			/**
-			 * Option: Divider
-			 */
-			array(
-				'name'     => ASTRA_THEME_SETTINGS . '[' . $section_id . '-margin-padding-divider]',
-				'type'     => 'control',
-				'section'  => $section_id,
-				'control'  => 'ast-divider',
-				'priority' => 200,
-				'settings' => array(),
-				'context'  => Astra_Builder_Helper::$design_tab,
-			),
-
-			/**
 			 * Option: Padded Layout Custom Width
 			 */
 			array(
@@ -87,19 +74,7 @@ final class Astra_Builder_Base_Configuration {
 					'left'   => __( 'Left', 'astra' ),
 				),
 				'context'           => Astra_Builder_Helper::$design_tab,
-			),
-
-			/**
-			 * Option: Divider
-			 */
-			array(
-				'name'     => ASTRA_THEME_SETTINGS . '[' . $section_id . '-margin-padding-inner-divider]',
-				'type'     => 'control',
-				'section'  => $section_id,
-				'control'  => 'ast-divider',
-				'priority' => 215,
-				'settings' => array(),
-				'context'  => Astra_Builder_Helper::$design_tab,
+				'divider'           => array( 'ast_class' => 'ast-bottom-divider ast-top-divider' ),
 			),
 
 			/**
@@ -143,19 +118,6 @@ final class Astra_Builder_Base_Configuration {
 
 			$_configs = array(
 
-				/**
-				 * Option: Divider
-				 */
-				array(
-					'name'     => ASTRA_THEME_SETTINGS . '[' . $section_id . '-typo-divider]',
-					'type'     => 'control',
-					'section'  => $section_id,
-					'control'  => 'ast-divider',
-					'priority' => 16,
-					'settings' => array(),
-					'context'  => empty( $required_condition ) ? Astra_Builder_Helper::$design_tab : $required_condition,
-				),
-
 				array(
 					'name'      => $parent,
 					'default'   => astra_get_option( $section_id . '-typography' ),
@@ -196,19 +158,6 @@ final class Astra_Builder_Base_Configuration {
 			$_configs = array(
 
 				/**
-				 * Option: Divider
-				 */
-				array(
-					'name'     => ASTRA_THEME_SETTINGS . '[font-size-' . $section_id . '-heading-divider]',
-					'type'     => 'control',
-					'section'  => $section_id,
-					'control'  => 'ast-divider',
-					'priority' => 16,
-					'settings' => array(),
-					'context'  => empty( $required_condition ) ? Astra_Builder_Helper::$design_tab : $required_condition,
-				),
-
-				/**
 				 * Option: Font Size
 				 */
 				array(
@@ -223,6 +172,7 @@ final class Astra_Builder_Base_Configuration {
 					'input_attrs' => array(
 						'min' => 0,
 					),
+					'divider'     => array( 'ast_class' => 'ast-bottom-divider' ),
 					'units'       => array(
 						'px' => 'px',
 						'em' => 'em',
@@ -244,23 +194,7 @@ final class Astra_Builder_Base_Configuration {
 	 */
 	public static function prepare_visibility_tab( $_section, $builder_type = 'header' ) {
 
-		$class_obj = Astra_Builder_Header::get_instance();
-
 		$configs = array(
-
-			/**
-			 * Option: Divider
-			 */
-			array(
-				'name'     => ASTRA_THEME_SETTINGS . '[' . $_section . '-visibility-divider]',
-				'type'     => 'control',
-				'section'  => $_section,
-				'control'  => 'ast-divider',
-				'priority' => 300,
-				'settings' => array(),
-				'context'  => ( 'footer' === $builder_type ) ?
-					Astra_Builder_Helper::$general_tab : Astra_Builder_Helper::$responsive_general_tab,
-			),
 
 			/**
 			 * Option: Hide on tablet
@@ -294,23 +228,21 @@ final class Astra_Builder_Base_Configuration {
 		);
 
 		if ( 'footer' === $builder_type ) {
-			$footer_configs = array(
-				/**
-				 * Option: Hide on desktop
-				 */
-				array(
-					'name'      => ASTRA_THEME_SETTINGS . '[' . $_section . '-hide-desktop]',
-					'type'      => 'control',
-					'control'   => 'ast-toggle-control',
-					'default'   => astra_get_option( $_section . '-hide-desktop' ),
-					'section'   => $_section,
-					'priority'  => 320,
-					'title'     => __( 'Hide on Desktop', 'astra' ),
-					'transport' => 'postMessage',
-					'context'   => Astra_Builder_Helper::$desktop_general_tab,
-				),
+			/**
+			 * Option: Hide on desktop
+			 */
+			$configs[] = array(
+				'name'      => ASTRA_THEME_SETTINGS . '[' . $_section . '-hide-desktop]',
+				'type'      => 'control',
+				'control'   => 'ast-toggle-control',
+				'default'   => astra_get_option( $_section . '-hide-desktop' ),
+				'section'   => $_section,
+				'priority'  => 320,
+				'title'     => __( 'Hide on Desktop', 'astra' ),
+				'transport' => 'postMessage',
+				'context'   => Astra_Builder_Helper::$desktop_general_tab,
+				'divider'   => array( 'ast_class' => 'ast-top-divider' ),
 			);
-			$configs        = array_merge( $configs, $footer_configs );
 		}
 
 		return $configs;
@@ -328,17 +260,17 @@ final class Astra_Builder_Base_Configuration {
 
 		if ( 'footer' === $type ) {
 			$component_limit = defined( 'ASTRA_EXT_VER' ) ?
-				Astra_Builder_Helper::$component_limit : Astra_Builder_Helper::$num_of_header_widgets;
+				Astra_Builder_Helper::$component_limit : Astra_Builder_Helper::$num_of_footer_widgets;
 		} else {
 			$component_limit = defined( 'ASTRA_EXT_VER' ) ?
-				Astra_Builder_Helper::$component_limit : Astra_Builder_Helper::$num_of_footer_widgets;
+				Astra_Builder_Helper::$component_limit : Astra_Builder_Helper::$num_of_header_widgets;
 		}
 
 		for ( $index = 1; $index <= $component_limit; $index++ ) {
 
 			$_section = 'sidebar-widgets-' . $type . '-widget-' . $index;
 
-			$_configs = array(
+			$html_config[] = array(
 
 				array(
 					'name'        => 'sidebar-widgets-' . $type . '-widget-' . $index,
@@ -348,18 +280,7 @@ final class Astra_Builder_Base_Configuration {
 					'panel'       => 'panel-' . $type . '-builder-group',
 					'clone_index' => $index,
 					'clone_type'  => $type . '-widget',
-				),
-
-				/**
-				 * Option: Divider
-				 */
-				array(
-					'name'     => ASTRA_THEME_SETTINGS . '[' . $type . '-widget-heading-' . $index . '-divider]',
-					'type'     => 'control',
-					'section'  => $_section,
-					'control'  => 'ast-divider',
-					'priority' => 6,
-					'settings' => array(),
+					'divider'     => array( 'ast_class' => 'ast-bottom-divider' ),
 				),
 
 				/**
@@ -375,6 +296,7 @@ final class Astra_Builder_Base_Configuration {
 					'transport'  => 'postMessage',
 					'control'    => 'ast-responsive-color',
 					'responsive' => true,
+					'divider'    => array( 'ast_class' => 'ast-top-divider' ),
 					'rgba'       => true,
 				),
 				/**
@@ -402,6 +324,7 @@ final class Astra_Builder_Base_Configuration {
 					'transport'  => 'postMessage',
 					'priority'   => 7,
 					'responsive' => true,
+					'divider'    => array( 'ast_class' => 'ast-bottom-divider' ),
 				),
 
 				/**
@@ -439,30 +362,6 @@ final class Astra_Builder_Base_Configuration {
 				),
 
 				/**
-				 * Option: Divider
-				 */
-				array(
-					'name'     => ASTRA_THEME_SETTINGS . '[' . $type . '-widget-typo-heading-' . $index . '-divider]',
-					'type'     => 'control',
-					'section'  => $_section,
-					'control'  => 'ast-divider',
-					'priority' => 89,
-					'settings' => array(),
-				),
-
-				/**
-				 * Option: Divider
-				 */
-				array(
-					'name'     => ASTRA_THEME_SETTINGS . '[' . $_section . '-margin-padding-heading-divider]',
-					'type'     => 'control',
-					'section'  => $_section,
-					'control'  => 'ast-divider',
-					'priority' => 200,
-					'settings' => array(),
-				),
-
-				/**
 				 * Option: Margin
 				 */
 				array(
@@ -487,22 +386,7 @@ final class Astra_Builder_Base_Configuration {
 			);
 
 			if ( 'footer' === $type ) {
-				array_push(
-					$_configs,
-					/**
-					 * Option: Divider
-					 */
-					array(
-						'name'     => ASTRA_THEME_SETTINGS . '[' . $type . '-widget-alignment-' . $index . '-divider]',
-						'type'     => 'control',
-						'section'  => $_section,
-						'control'  => 'ast-divider',
-						'priority' => 5,
-						'settings' => array(),
-					),
-					/**
-					 * Option: Column Alignment
-					 */
+				$html_config [] = array(
 					array(
 						'name'      => ASTRA_THEME_SETTINGS . '[' . $type . '-widget-alignment-' . $index . ']',
 						'default'   => astra_get_option( $type . '-widget-alignment-' . $index ),
@@ -517,13 +401,13 @@ final class Astra_Builder_Base_Configuration {
 							'center' => 'align-center',
 							'right'  => 'align-right',
 						),
-					)
+						'divider'   => array( 'ast_class' => 'ast-top-divider' ),
+					),
 				);
 			}
 
 			if ( defined( 'ASTRA_EXT_VER' ) && Astra_Ext_Extension::is_active( 'typography' ) ) {
-
-				$new_configs = array(
+				$html_config[] = array(
 
 					/**
 					 * Option: Widget Title Typography
@@ -537,19 +421,9 @@ final class Astra_Builder_Base_Configuration {
 						'section'   => $_section,
 						'transport' => 'postMessage',
 						'priority'  => 90,
+						'divider'   => array( 'ast_class' => 'ast-bottom-divider' ),
 					),
 
-					/**
-					 * Option: Divider
-					 */
-					array(
-						'name'     => ASTRA_THEME_SETTINGS . '[' . $type . '-widget-' . $index . '-text-typography-divider]',
-						'type'     => 'control',
-						'section'  => $_section,
-						'control'  => 'ast-divider',
-						'priority' => 90,
-						'settings' => array(),
-					),
 
 					/**
 					 * Option: Widget Title Font Size
@@ -585,6 +459,7 @@ final class Astra_Builder_Base_Configuration {
 						'section'   => $_section,
 						'transport' => 'postMessage',
 						'priority'  => 91,
+						'divider'   => array( 'ast_class' => 'ast-bottom-divider' ),
 					),
 
 					/**
@@ -609,10 +484,8 @@ final class Astra_Builder_Base_Configuration {
 						),
 					),
 				);
-
 			} else {
-
-				$new_configs = array(
+				$html_config[] = array(
 
 					/**
 					 * Option: Widget Title Font Size
@@ -656,19 +529,13 @@ final class Astra_Builder_Base_Configuration {
 						),
 					),
 				);
-
 			}
-
-			$_configs = array_merge( $_configs, $new_configs );
 
 			$html_config[] = self::prepare_visibility_tab( $_section, $type );
 
-			$_configs = array_merge( $_configs, self::prepare_visibility_tab( $_section, $type ) );
-
-			$html_config[] = $_configs;
 		}
 
-		return $html_config;
+		return call_user_func_array( 'array_merge', $html_config + array( array() ) );
 
 	}
 

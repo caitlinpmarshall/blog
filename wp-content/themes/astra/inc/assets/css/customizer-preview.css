@@ -160,7 +160,7 @@ body.customize-partial-edit-shortcuts-shown .customize-partial-edit-shortcut but
 }
 
 /* Mobile popup content - Edit shortcuts compatibility */
-.ast-mobile-popup-content .ast-builder-layout-element, .ast-mobile-header-wrap .ast-builder-layout-element {
+.ast-mobile-popup-content .ast-builder-layout-element, .ast-mobile-header-wrap .ast-builder-layout-element, .ast-desktop-popup-content .ast-builder-layout-element, .ast-desktop-header-wrap .ast-builder-layout-element {
     position: relative;
 }
 
