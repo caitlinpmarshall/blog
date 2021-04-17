@@ -3874,6 +3874,16 @@ body.admin-bar.ast-primary-sticky-header-active .ast-mobile-popup-drawer .ast-mo
   width: 150px;
 }
 
+.ast-desktop .main-header-menu > .menu-item .sub-menu:before,
+.ast-desktop .main-header-menu > .menu-item .astra-full-megamenu-wrapper:before {
+  position: absolute;
+  content: '';
+  top: 0;
+  left: 0;
+  width: 100%;
+  transform: translateY(-100%);
+}
+
 /*----------  Forms  ----------*/
 /**
  * 	Form Fields

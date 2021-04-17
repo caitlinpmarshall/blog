@@ -189,7 +189,7 @@ class Astra_Markup {
 	 * @return string.
 	 */
 	public function ast_grid_col_6() {
-		return Astra_Builder_Helper::apply_flex_based_css() ? 'ast-width-md-6' : 'ast-col-xs-12'; 
+		return Astra_Builder_Helper::apply_flex_based_css() ? 'ast-width-md-6' : 'ast-col-md-6'; 
 	}
 
 	/** 
