@@ -64,8 +64,30 @@ input[type=email], input[type=number], input[type=password], input[type=reset], 
     margin: 1em 0;
 }
 
-/*
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Libre Baskerville', serif;
+/* api page styles */
+.api-wrapper {
+
 }
-*/
+
+.api-button {
+    padding: 10px;
+    font-weight: 700;
+}
+
+.api-button {
+    padding: 10px;
+    margin: 10px;
+    font-weight: 700;
+    border: 3px solid #028090;
+}
+
+.api-button:hover {
+    color:#028090;
+    background-color: #fff;
+}
+
+.api-fact-text {
+    margin: 20px;
+
+}
+

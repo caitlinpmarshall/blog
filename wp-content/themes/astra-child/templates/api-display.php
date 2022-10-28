@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header(); ?>
 
 	<div id="primary" <?php astra_primary_class(); ?>>
-		<div class="wrapper">
+		<div class="api-wrapper">
 			<button class="api-button" onclick="callAPI()">click me</button>
 			<h2 class="api-fact-text" id="fact"></h2>
 
