@@ -54,5 +54,5 @@ wp-content/wflogs/*
 #
 # Note: If you wish to whitelist themes,
 # uncomment the next line
-/wp-content/themes
+/wp-content/themes/*
 !/wp-content/themes/astra-child
