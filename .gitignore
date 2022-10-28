@@ -39,6 +39,7 @@ wp-config.php
 
 # Log files
 *.log
+wp-content/wflogs/
 wp-content/wflogs/*
 
 # htaccess
