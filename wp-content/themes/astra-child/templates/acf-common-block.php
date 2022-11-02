@@ -1,6 +1,6 @@
 <?php
 /**
- * ACF Common Block Template
+ * Template Name: ACF Common Block Template
  *
  * @link https://codex.wordpress.org/Template_Hierarchy
  *
