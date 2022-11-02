@@ -18,9 +18,7 @@ function astra_child_scripts(){
 }
 add_action( 'wp_enqueue_scripts', 'astra_child_scripts' );
 
-/**********************************************************************************/
-/* Acf Common Blocks */
-/**********************************************************************************/
+/* -------------- Advanced Custom Fields --------------------- */
 add_action('acf/init', 'acf_common_block_init');
 function acf_common_block_init()
 {
@@ -41,5 +39,28 @@ function acf_common_block_callback($block)
 {
 	if (file_exists(get_stylesheet_directory_uri() . "/templates/acf-common-block.php")) {
 		include(get_stylesheet_directory_uri() . "/templates/acf-common-block.php");
+	}
+}
+
+add_action('acf/init', 'acf_featured_org_init');
+function acf_featured_org_init()
+{
+	if (function_exists('acf_register_block')) {
+		acf_register_block([
+			'name'            => 'featured-org',
+			'title'           => __('Featured Org'),
+			'description'     => __('Featured Org'),
+			'render_callback' => 'acf_featured_org_callback',
+			'category'        => 'formatting',
+			'icon'            => 'admin-comments',
+			'keywords'        => array('button', 'text', 'acf'),
+		]);
+	}
+}
+
+function acf_featured_org_callback($block)
+{
+	if (file_exists(get_stylesheet_directory_uri() . "/templates/featured-org.php")) {
+		include(get_stylesheet_directory_uri() . "/templates/featured-org.php");
 	}
 }
