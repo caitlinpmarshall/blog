@@ -39,7 +39,7 @@ function acf_common_block_init()
 
 function acf_common_block_callback($block)
 {
-	if (file_exists(get_stylesheet_directory_uri() . "/template-parts/block/content-acf-common-block.php")) {
-		include(get_stylesheet_directory_uri() . "/template-parts/block/content-acf-common-block.php");
+	if (file_exists(get_stylesheet_directory_uri() . "/templates/acf-common-block.php")) {
+		include(get_stylesheet_directory_uri() . "/templates/acf-common-block.php");
 	}
 }

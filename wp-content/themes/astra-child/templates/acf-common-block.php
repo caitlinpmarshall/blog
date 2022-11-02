@@ -1,8 +1,19 @@
 <?php
+/**
+ * ACF Common Block Template
+ *
+ * @link https://codex.wordpress.org/Template_Hierarchy
+ *
+ * @package Astra
+ * @since 1.0.0
+ */
+
 $id = 'about-' . $block['id'];
 $block_image = get_field('block_image');
 $block_heading = get_field('block_heading');
 $block_description = get_field('block_description');
+
+get_header();
 ?>
 
 <section class="section-about <?php echo $block['className'] ?>" id="<?php echo $id; ?>">
@@ -26,3 +37,5 @@ $block_description = get_field('block_description');
 		</div>
 	</div>
 </section>    
+
+<?php get_footer(); ?>
