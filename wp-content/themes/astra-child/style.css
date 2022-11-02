@@ -64,15 +64,19 @@ input[type=email], input[type=number], input[type=password], input[type=reset], 
     margin: 1em 0;
 }
 
-/* ACF Common Block Styles */
-.acf-common-block {
+/* ACF Template Styles */
+.acf-common-block, .featured-org {
     padding: 100px 0;
 }
 
-.about-hero-img {
+.about-hero-img, .featured-hero-img {
     margin-bottom: 20px;
 }
 
-.about-description h2 {
+.about-description h2, .featured-description h2 {
     padding-bottom: 10px;
+}
+
+.focus-areas {
+    font-weight: 700;
 }
