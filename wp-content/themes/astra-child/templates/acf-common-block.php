@@ -9,6 +9,7 @@
  */
 
 $id = 'about-' . $block['id'];
+$block['className'] = "acf-common-block";
 $block_image = get_field('block_image');
 $block_heading = get_field('block_heading');
 $block_description = get_field('block_description');
