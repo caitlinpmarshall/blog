@@ -17,3 +17,29 @@ function astra_child_scripts(){
     wp_enqueue_style( 'astra-child-google-fonts', 'https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Poppins:ital,wght@0,200;0,400;0,700;1,400&display=swap');
 }
 add_action( 'wp_enqueue_scripts', 'astra_child_scripts' );
+
+/**********************************************************************************/
+/* Acf Common Blocks */
+/**********************************************************************************/
+add_action('acf/init', 'acf_common_block_init');
+function acf_common_block_init()
+{
+	if (function_exists('acf_register_block')) {
+		acf_register_block([
+			'name'            => 'common-block',
+			'title'           => __('Common Block'),
+			'description'     => __('Common Block', 'gutenberg-common-block-acf-example'),
+			'render_callback' => 'acf_common_block_callback',
+			'category'        => 'formatting',
+			'icon'            => 'admin-comments',
+			'keywords'        => array('button', 'text', 'acf'),
+		]);
+	}
+}
+
+function acf_common_block_callback($block)
+{
+	if (file_exists(get_stylesheet_directory_uri() . "/templates/acf-common-block.php")) {
+		include(get_stylesheet_directory_uri() . "/templates/acf-common-block.php");
+	}
+}
