@@ -58,7 +58,7 @@ class Astra_Header_Menu_Component {
 
 		$_prefix = 'menu' . $index;
 
-		$submenu_class         = apply_filters( 'secondary_submenu_border_class', ' submenu-with-border' );
+		$submenu_class         = apply_filters( 'astra_secondary_submenu_border_class', ' submenu-with-border' );
 		$stack_on_mobile_class = 'inline-on-mobile';
 
 		if ( astra_get_option( 'header-' . $_prefix . '-menu-stack-on-mobile' ) ) {
@@ -83,14 +83,14 @@ class Astra_Header_Menu_Component {
 		 * @since  3.0.0
 		 * @var Array
 		 */
-		$menu_classes = apply_filters( 'astra_' . $theme_location . '_menu_classes', array( 'main-header-menu', 'ast-nav-menu', 'ast-flex', $submenu_class, $stack_on_mobile_class ) );
+		$menu_classes = apply_filters( 'astra_' . $theme_location . '_menu_classes', array( 'main-header-menu', 'ast-menu-shadow', 'ast-nav-menu', 'ast-flex', $submenu_class, $stack_on_mobile_class ) );
 
 		$items_wrap  = '<nav ';
 		$items_wrap .= astra_attr(
 			'site-navigation',
 			array(
-				'id'         => 'site-navigation',
-				'class'      => 'ast-flex-grow-1 navigation-accessibility site-header-focus-item',
+				'id'         => esc_attr( $theme_location ) . '-site-navigation',
+				'class'      => 'site-navigation ast-flex-grow-1 navigation-accessibility site-header-focus-item',
 				'aria-label' => esc_attr__( 'Site Navigation', 'astra' ),
 			)
 		);
@@ -119,6 +119,7 @@ class Astra_Header_Menu_Component {
 			Astra_Builder_UI_Controller::render_customizer_edit_button();
 		}
 		if ( has_nav_menu( $theme_location ) ) {
+			/** @psalm-suppress ArgumentTypeCoercion */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 			wp_nav_menu(
 				array(
 					'menu_id'         => 'ast-hf-menu-' . $index,
@@ -129,13 +130,14 @@ class Astra_Header_Menu_Component {
 					'theme_location'  => $theme_location,
 				)
 			);
+				/** @psalm-suppress ArgumentTypeCoercion */ // phpcs:ignore Generic.Commenting.DocComment.MissingShort
 		} else {
 				echo '<div class="main-header-bar-navigation ast-flex-1">';
 					echo '<nav ';
 					echo astra_attr(
 						'site-navigation',
 						array(
-							'id' => 'site-navigation',
+							'id' => esc_attr( $theme_location ) . '-site-navigation',
 						)
 					);
 					echo ' class="ast-flex-grow-1 navigation-accessibility" aria-label="' . esc_attr__( 'Site Navigation', 'astra' ) . '">';

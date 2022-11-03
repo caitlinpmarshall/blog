@@ -75,6 +75,7 @@ class Astra_Header_Menu_Component_Loader {
 			'AstraBuilderMenuData',
 			array(
 				'component_limit'    => defined( 'ASTRA_EXT_VER' ) ? Astra_Builder_Helper::$component_limit : Astra_Builder_Helper::$num_of_header_menu,
+				'nav_menu_enabled'   => ( defined( 'ASTRA_EXT_VER' ) && Astra_Ext_Extension::is_active( 'nav-menu' ) ) ? true : false,
 				'tablet_break_point' => astra_get_tablet_breakpoint(),
 				'mobile_break_point' => astra_get_mobile_breakpoint(),
 			)
