@@ -30,6 +30,8 @@ wp-config.php
 
 # Example themes
 /wp-content/themes/twenty*/
+/wp-content/themes/astra/
+
 
 # Example plugin
 /wp-content/plugins/hello.php
@@ -57,5 +59,4 @@ wp-config.php
 #
 # Note: If you wish to whitelist themes,
 # uncomment the next line
-/wp-content/themes/*
-!/wp-content/themes/astra-child
+# /wp-content/themes/

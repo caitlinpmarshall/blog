@@ -1,0 +1,58 @@
+/* Global Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+#content .ast-container {
+    max-width: 1000px;
+}
+
+.blog-layout-1 .post-thumb {
+    display: flex;
+    justify-content: center;
+}
+
+/* Global Color Styles */
+.ast-separate-container {
+    background-color: #fff;
+}
+
+a, .page-links .page-link, .single .post-navigation a, .entry-meta, .entry-meta * {
+    color: #028090;
+}
+
+.menu-toggle, button, .ast-button, .ast-custom-button, .button, input#submit, input[type="button"], input[type="submit"], input[type="reset"] {
+    background-color: #028090;
+    border-color: #028090;
+}
+
+.site-above-footer-wrap[data-section="section-above-footer-builder"] {
+    background-color: #fff;
+    border-top: 2px solid #028090;
+}
+
+.site-below-footer-wrap[data-section="section-below-footer-builder"] {
+    background-color: #fff;
+}
+
+/* Global Link Styles */
+.site-title, .entry-title {
+    a {
+        text-decoration: none;
+        &:hover {
+            text-decoration: underline;
+            text-decoration-thickness: 2px;
+        }
+    }
+}
+
+/* Footer Styles */
+.ast-footer-social-1-wrap .ast-builder-social-element svg {
+    width: 30px;
+    height: 30px;
+}
+
+/* Contact Page Styles */
+input[type=email], input[type=number], input[type=password], input[type=reset], input[type=search], input[type=tel], input[type=text], input[type=url], select, textarea {
+    margin: 1em 0;
+}
