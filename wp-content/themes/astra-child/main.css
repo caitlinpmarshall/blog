@@ -1,3 +1,8 @@
 a {
   background-color: #fadadd;
+  border: 2px solid black;
+}
+
+p {
+  border: 3px solid blue;
 }/*# sourceMappingURL=main.css.map */

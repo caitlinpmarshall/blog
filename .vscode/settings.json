@@ -4,8 +4,8 @@
         {
             "format": "expanded",
             "extensionName": ".css",
-            "savePath": "/wp-content/themes"
+            "savePath": "/wp-content/themes/astra-child"
         }
     ],
-    "liveSassCompile.settings.watchOnLaunch": false
+    "liveSassCompile.settings.watchOnLaunch": true
 }
