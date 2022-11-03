@@ -60,13 +60,16 @@ input[type=email], input[type=number], input[type=password], input[type=reset], 
 }
 
 .about-hero-img, .featured-hero-img {
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
 }
 
 .about-description h2, .featured-description h2 {
-  padding-bottom: 10px;
+  padding-bottom: 1rem;
 }
 
 .focus-areas {
   font-weight: 700;
+}
+.focus-areas p:first-child {
+  margin-bottom: 0.5rem;
 }/*# sourceMappingURL=main.css.map */

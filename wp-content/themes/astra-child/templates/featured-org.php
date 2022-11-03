@@ -37,7 +37,10 @@ get_header();
 				<?php } ?>
 				<?php
 				if (!empty($focus_areas)) { ?>
-					<p class="focus-areas">Areas of focus: <?php echo $focus_areas; ?></p>
+					<div class="focus-areas">
+						<p>Areas of focus:</p>
+						<p><?php echo $focus_areas; ?></p>
+					</div>
 				<?php } ?>
 				<?php
 				if (!empty($website_link)) { ?>
