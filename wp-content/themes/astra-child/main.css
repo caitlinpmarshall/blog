@@ -53,4 +53,20 @@ a, .page-links .page-link, .single .post-navigation a, .entry-meta, .entry-meta 
 /* Contact Page Styles */
 input[type=email], input[type=number], input[type=password], input[type=reset], input[type=search], input[type=tel], input[type=text], input[type=url], select, textarea {
   margin: 1em 0;
+}
+
+.acf-common-block, .featured-org {
+  padding: 100px 0;
+}
+
+.about-hero-img, .featured-hero-img {
+  margin-bottom: 20px;
+}
+
+.about-description h2, .featured-description h2 {
+  padding-bottom: 10px;
+}
+
+.focus-areas {
+  font-weight: 700;
 }/*# sourceMappingURL=main.css.map */
