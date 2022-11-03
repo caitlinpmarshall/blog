@@ -452,6 +452,56 @@ class wfWAFRuleLogicalOperator implements wfWAFRuleInterface {
 	}
 }
 
+class wfWAFPhpBlock {
+	public $echoTag;
+	public $shortTag;
+	public $openParentheses = 0, $closedParentheses = 0;
+	public $backtickCount = 0;
+	public $badCharacter = false;
+	public $mismatchedParentheses = false;
+
+	public function __construct($echoTag = false, $shortTag = false) {
+		$this->echoTag = $echoTag;
+		$this->shortTag = $shortTag;
+	}
+
+	public function hasParentheses() {
+		return $this->openParentheses > 0 && $this->closedParentheses === $this->openParentheses;
+	}
+
+	public function hasBacktickPair() {
+		return $this->backtickCount > 0 && $this->backtickCount % 2 === 0;
+	}
+
+	public function hasParenthesesOrBacktickPair() {
+		return $this->hasParentheses() || $this->hasBacktickPair();
+	}
+
+	public function hasMismatchedParentheses() {
+		return $this->mismatchedParentheses || $this->closedParentheses !== $this->openParentheses;
+	}
+
+	public function hasSyntaxError() {
+		if (version_compare(phpversion(), '8.0.0', '>=')) {
+			return $this->badCharacter;
+		}
+		return $this->hasMismatchedParentheses();
+	}
+
+	public static function isValid($phpBlock) {
+		return $phpBlock !== null && !$phpBlock->hasSyntaxError();
+	}
+
+	public static function extend($phpBlock, $echoTag = false, $shortTag = false) {
+		if ($phpBlock === null)
+			$phpBlock = new self();
+		$phpBlock->open = true;
+		$phpBlock->echoTag = $echoTag;
+		$phpBlock->shortTag = $shortTag;
+		return $phpBlock;
+	}
+}
+
 class wfWAFRuleComparison implements wfWAFRuleInterface {
 
 	private $matches;
@@ -462,7 +512,7 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 	 */
 	private $rule;
 
-	protected static $allowedActions = array(
+	private static $scalarActions = array(
 		'contains',
 		'notcontains',
 		'match',
@@ -502,7 +552,24 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 		'versiongreaterthanequalto',
 		'versionlessthan',
 		'versionlessthanequalto',
+		'exists'
 	);
+
+	private static $arrayActions = array(
+		'keyexists',
+		'keymatches'
+	);
+
+	private static $globalActions = array(
+		'hasuser',
+		'nothasuser',
+		'currentusercan',
+		'currentusercannot'
+	);
+
+	const ACTION_TYPE_SCALAR=0;
+	const ACTION_TYPE_ARRAY=1;
+	const ACTION_TYPE_GLOBAL=2;
 
 	/**
 	 * @var mixed
@@ -554,6 +621,9 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 		}
 		$return = '';
 		$global = array_shift($subject);
+		if ($global instanceof wfWAFRuleComparisonSubject) {
+			$global = 'filtered';
+		}
 		foreach ($subject as $key) {
 			$return .= '[' . $key . ']';
 		}
@@ -601,13 +671,42 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 			$subjectExport);
 	}
 
+	public function getActionType() {
+		$action=wfWAFUtils::strtolower($this->getAction());
+		if (in_array($action, self::$scalarActions)) {
+			return self::ACTION_TYPE_SCALAR;
+		}
+		else if(in_array($action, self::$arrayActions)) {
+			return self::ACTION_TYPE_ARRAY;
+		}
+		else if(in_array($action, self::$globalActions)) {
+			return self::ACTION_TYPE_GLOBAL;
+		}
+		else {
+			return null;
+		}
+	}
+
 	public function isActionValid() {
-		return in_array(wfWAFUtils::strtolower($this->getAction()), self::$allowedActions);
+		return $this->getActionType() !== null;
+	}
+
+	public function hasSubject() {
+		return $this->getActionType() !== self::ACTION_TYPE_GLOBAL;
+	}
+
+	private function isWhitelisted($subjectKey = '') {
+		return $this->getWAF() && $this->getRule() &&
+			$this->getWAF()->isRuleParamWhitelisted($this->getRule()->getRuleID(), $this->getWAF()->getRequest()->getPath(), $subjectKey);
 	}
 
 	public function evaluate() {
-		if (!$this->isActionValid()) {
+		$type = $this->getActionType();
+		if ($type===null) {
 			return false;
+		}
+		else if ($type===self::ACTION_TYPE_GLOBAL) {
+			return (!$this->isWhitelisted()) && ($this->result=call_user_func(array($this, $this->getAction())));
 		}
 		$subjects = $this->getSubjects();
 		if (!is_array($subjects)) {
@@ -620,7 +719,7 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 			$global = $subject->getValue();
 			$subjectKey = $subject->getKey();
 
-			if ($this->_evaluate(array($this, $this->getAction()), $global, $subjectKey)) {
+			if ($this->_evaluate(array($this, $this->getAction()), $global, $subjectKey, $type===self::ACTION_TYPE_SCALAR)) {
 				$this->result = true;
 			}
 		}
@@ -631,20 +730,19 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 	 * @param callback $callback
 	 * @param mixed $global
 	 * @param string $subjectKey
+	 * @param bool $iterate
 	 * @return bool
 	 */
-	private function _evaluate($callback, $global, $subjectKey) {
+	private function _evaluate($callback, $global, $subjectKey, $iterate) {
 		$result = false;
 
-		if ($this->getWAF() && $this->getRule() &&
-			$this->getWAF()->isRuleParamWhitelisted($this->getRule()->getRuleID(), $this->getWAF()->getRequest()->getPath(), $subjectKey)
-		) {
+		if ($this->isWhitelisted($subjectKey)) {
 			return $result;
 		}
 
-		if (is_array($global)) {
+		if (is_array($global) && $iterate) {
 			foreach ($global as $key => $value) {
-				if ($this->_evaluate($callback, $value, $subjectKey . '[' . $key . ']')) {
+				if ($this->_evaluate($callback, $value, $subjectKey . '[' . $key . ']', $iterate)) {
 					$result = true;
 				}
 			}
@@ -652,7 +750,7 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 			$result = true;
 			$this->failedSubjects[] = array(
 				'subject'    => $subjectKey,
-				'value'      => $global,
+				'value'      => is_string($global) ? $global : wfWAFUtils::json_encode($global),
 				'multiplier' => $this->getMultiplier(),
 				'matches'    => $this->getMatches(),
 			);
@@ -749,6 +847,22 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 		return !$this->currentUserIs($subject);
 	}
 
+	public function hasUser() {
+		return $this->getWAF()->parseAuthCookie()!==false;
+	}
+
+	public function notHasUser() {
+		return !$this->hasUser();
+	}
+
+	public function currentUserCan() {
+		return $this->getWAF()->checkCapability($this->getExpected());
+	}
+
+	public function currentUserCannot() {
+		return !$this->currentUserCan();
+	}
+
 	public function md5Equals($subject) {
 		return md5((string) $subject) === $this->getExpected();
 	}
@@ -829,186 +943,161 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 		if ($backtrackLimit !== false) { ini_set('pcre.backtrack_limit', $backtrackLimit); }
 		return false;
 	}
-	
+
+	private function checkForPhp($path) {
+		if (!is_file($path))
+			return false;
+		$fh = @fopen($path, 'r');
+		if ($fh === false)
+			return false;
+		//T_BAD_CHARACTER is only available since PHP 7.4.0 and before 7.0.0
+		$T_BAD_CHARACTER = defined('T_BAD_CHARACTER') ? constant('T_BAD_CHARACTER') : 10001;
+		$phpBlock = null;
+		$wrappedTokenCheckBytes = '';
+		$maxTokenSize = 15; //__halt_compiler
+		$possibleWrappedTokens = array('<?php', '<?=', '<?', '?>', 'exit', 'new', 'clone', 'echo', 'print', 'require', 'include', 'require_once', 'include_once', '__halt_compiler');
+
+		$readsize = 1024 * 1024; //1MB chunks
+		$iteration = 0;
+		$shortOpenTagEnabled = (bool) ini_get('short_open_tag');
+		do {
+			$data = fread($fh, $readsize);
+			$actualReadsize = strlen($data);
+			if ($actualReadsize === 0)
+				break;
+
+			//Make sure we didn't miss PHP split over a chunking boundary
+			$wrappedCheckLength = strlen($wrappedTokenCheckBytes);
+			if ($wrappedCheckLength > 0) {
+				$testBytes = $wrappedTokenCheckBytes . substr($data, 0, min($maxTokenSize, $actualReadsize));
+				foreach ($possibleWrappedTokens as $t) {
+					$position = strpos($testBytes, $t);
+					if ($position !== false && $position < $wrappedCheckLength && $position + strlen($t) >= $wrappedCheckLength) { //Found a token that starts before this segment of data and ends within it
+						$data = substr($wrappedTokenCheckBytes, $position) . $data;
+						break;
+					}
+				}
+			}
+
+			$prepended = NULL;
+
+			//Make sure it tokenizes correctly if chunked
+			if ($phpBlock !== null) {
+				if ($phpBlock->echoTag) {
+					$data = '<?= ' . $data;
+					$prepended = T_OPEN_TAG_WITH_ECHO;
+				}
+				else {
+					$data = '<?php ' . $data;
+					$prepended = T_OPEN_TAG;
+				}
+			}
+
+			//Tokenize the data and check for PHP
+			$this->_resetErrors();
+			$tokens = @token_get_all($data);
+			$error = error_get_last();
+
+			if ($error !== null && feof($fh) && stripos($error['message'], 'Unterminated comment') !== false)
+				break;
+
+			$firstToken = reset($tokens);
+			if (is_array($firstToken) && $firstToken[0] === $prepended)
+				array_shift($tokens); //Ignore the prepended token; it is only relevant for token_get_all
+
+			$offset = 0;
+			foreach ($tokens as $token) {
+				if (is_array($token)) {
+					$offset += strlen($token[1]);
+					switch ($token[0]) {
+						case T_OPEN_TAG:
+							$phpBlock = wfWAFPhpBlock::extend($phpBlock, false, $token[1] === '<?');
+							break;
+						case T_OPEN_TAG_WITH_ECHO:
+							$phpBlock = wfWAFPhpBlock::extend($phpBlock, true);
+							break;
+						case T_CLOSE_TAG:
+							if (wfWAFPhpBlock::isValid($phpBlock) && ($phpBlock->echoTag || $phpBlock->hasParenthesesOrBacktickPair())) {
+								fclose($fh);
+								return true;
+							}
+							$phpBlock->open = false;
+							break;
+						case T_NEW:
+						case T_CLONE:
+						case T_ECHO:
+						case T_PRINT:
+						case T_REQUIRE:
+						case T_INCLUDE:
+						case T_REQUIRE_ONCE:
+						case T_INCLUDE_ONCE:
+						case T_HALT_COMPILER:
+						case T_EXIT:
+							if (wfWAFPhpBlock::isValid($phpBlock)) {
+								fclose($fh);
+								return true;
+							}
+							break;
+						case $T_BAD_CHARACTER:
+							if ($phpBlock !== null)
+								$phpBlock->badCharacter = true;
+							break;
+						case T_STRING:
+							if (!$phpBlock->shortTag && preg_match('/^[A-z0-9_]{3,}$/', $token[1]) && function_exists($token[1])) {
+								fclose($fh);
+								return true;
+							}
+							break;
+					}
+				}
+				else {
+					$offset += strlen($token);
+					if ($phpBlock !== null) {
+						switch ($token) {
+							case '(':
+								$phpBlock->openParentheses++;
+								break;
+							case ')':
+								if ($phpBlock->openParentheses > $phpBlock->closedParentheses)
+									$phpBlock->closedParentheses++;
+								else
+									$phpBlock->mismatchedParentheses = true;
+								break;
+							case '`':
+								$phpBlock->backtickCount++;
+								break;
+						}
+					}
+				}
+			}
+
+			if (wfWAFPhpBlock::isValid($phpBlock) && $phpBlock->hasParenthesesOrBacktickPair()) {
+				fclose($fh);
+				return true;
+			}
+
+			$wrappedTokenCheckBytes = substr($data, - min($maxTokenSize, $actualReadsize));
+		} while (!feof($fh));
+
+		fclose($fh);
+		return false;
+	}
+
 	public function fileHasPHP($subject) {
 		$request = $this->getWAF()->getRequest();
 		$files = $request->getFiles();
 		if (!is_array($files)) {
 			return false;
 		}
-		
+
 		foreach ($files as $file) {
-			if ($file['name'] == (string) $subject) {
-				if (!is_file($file['tmp_name'])) {
-					continue;
-				}
-				$fh = @fopen($file['tmp_name'], 'r');
-				if (!$fh) {
-					continue;
-				}
-				
-				$totalRead = 0;
-				$insideOpenTag = false;
-				$hasExecutablePHP = false;
-				$possiblyHasExecutablePHP = false;
-				$hasOpenParen = false;
-				$hasCloseParen = false;
-				$backtickCount = 0;
-				$wrappedTokenCheckBytes = '';
-				$maxTokenSize = 15; //__halt_compiler
-				$possibleWrappedTokens = array('<?php', '<?=', '<?', '?>', 'exit', 'new', 'clone', 'echo', 'print', 'require', 'include', 'require_once', 'include_once', '__halt_compiler');
-				
-				$readsize = 100 * 1024; //100k at a time
-				while (!feof($fh)) {
-					$data = fread($fh, $readsize);
-					$actualReadsize = strlen($data);
-					$totalRead += $actualReadsize;
-					if ($totalRead < 1) {
-						break;
-					}
-					
-					//Make sure we didn't miss PHP split over a chunking boundary
-					$wrappedCheckLength = strlen($wrappedTokenCheckBytes);
-					if ($wrappedCheckLength > 0) {
-						$testBytes = $wrappedTokenCheckBytes . substr($data, 0, min($maxTokenSize, $actualReadsize));
-						foreach ($possibleWrappedTokens as $t) {
-							$position = strpos($testBytes, $t);
-							if ($position !== false && $position < $wrappedCheckLength && $position + strlen($t) >= $wrappedCheckLength) { //Found a token that starts before this segment of data and ends within it
-								$data = substr($wrappedTokenCheckBytes, $position) . $data;
-								break;
-							}
-						}
-					}
-					
-					//Make sure it tokenizes correctly if chunked
-					if ($insideOpenTag) {
-						if ($possiblyHasExecutablePHP) {
-							$data = '<?= ' . $data; 
-						}
-						else {
-							$data = '<?php ' . $data;
-						}
-					}
-					
-					//Tokenize the data and check for PHP
-					$this->_resetErrors();
-					$tokens = @token_get_all($data);
-					$error = error_get_last();
-					if ($error !== null && stripos($error['message'], 'Unexpected character in input') !== false) {
-						break;
-					}
-					
-					if ($error !== null && feof($fh) && stripos($error['message'], 'Unterminated comment') !== false) {
-						break;
-					}
-					
-					$offset = 0;
-					foreach ($tokens as $token) {
-						if (is_array($token)) {
-							$offset += strlen($token[1]);
-							switch ($token[0]) {
-								case T_OPEN_TAG:
-									$insideOpenTag = true;
-									$hasOpenParen = false;
-									$hasCloseParen = false;
-									$backtickCount = 0;
-									$possiblyHasExecutablePHP = false;
-									
-									if ($error !== null && stripos($error['message'], 'Unterminated comment') !== false) {
-										$testOffset = $offset - strlen($token[1]);
-										$commentStart = strpos($data, '/*', $testOffset);
-										if ($commentStart !== false) {
-											$testBytes = substr($data, $testOffset, $commentStart - $testOffset);
-											$this->_resetErrors();
-											@token_get_all($testBytes);
-											$error = error_get_last();
-											if ($error !== null && stripos($error['message'], 'Unexpected character in input') !== false) {
-												break 3;
-											}
-										}
-									}
-									
-									break;
-								
-								case T_OPEN_TAG_WITH_ECHO:
-									$insideOpenTag = true;
-									$hasOpenParen = false;
-									$hasCloseParen = false;
-									$backtickCount = 0;
-									$possiblyHasExecutablePHP = true;
-									
-									if ($error !== null && stripos($error['message'], 'Unterminated comment') !== false) {
-										$testOffset = $offset - strlen($token[1]);
-										$commentStart = strpos($data, '/*', $testOffset);
-										if ($commentStart !== false) {
-											$testBytes = substr($data, $testOffset, $commentStart - $testOffset);
-											$this->_resetErrors();
-											@token_get_all($testBytes);
-											$error = error_get_last();
-											if ($error !== null && stripos($error['message'], 'Unexpected character in input') !== false) {
-												break 3;
-											}
-										}
-									}
-									
-									break;
-								
-								case T_CLOSE_TAG:
-									$insideOpenTag = false;
-									if ($possiblyHasExecutablePHP) {
-										$hasExecutablePHP = true; //Assume the echo short tag outputted something useful
-									}
-									break 2;
-									
-								case T_NEW:
-								case T_CLONE:
-								case T_ECHO:
-								case T_PRINT:
-								case T_REQUIRE:
-								case T_INCLUDE:
-								case T_REQUIRE_ONCE:
-								case T_INCLUDE_ONCE:
-								case T_HALT_COMPILER:
-								case T_EXIT:
-									$hasExecutablePHP = true;
-									break 2;
-							}
-						}
-						else {
-							$offset += strlen($token);
-							switch ($token) {
-								case '(':
-									$hasOpenParen = true;
-									break;
-								case ')':
-									$hasCloseParen = true;
-									break;
-								case '`':
-									$backtickCount++;
-									break;
-							}
-						}
-						if (!$hasExecutablePHP && (($hasOpenParen && $hasCloseParen) || ($backtickCount > 1 && $backtickCount % 2 === 0))) {
-							$hasExecutablePHP = true;
-							break;
-						}
-					}
-					
-					if ($hasExecutablePHP) {
-						fclose($fh);
-						return true;
-					}
-					
-					$wrappedTokenCheckBytes = substr($data, - min($maxTokenSize, $actualReadsize)); 
-				}
-				
-				fclose($fh);
-			}
+			if ($file['name'] === (string) $subject && $this->checkForPhp($file['tmp_name']))
+					return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	private function _resetErrors() {
 		if (function_exists('error_clear_last')) {
 			error_clear_last();
@@ -1185,6 +1274,28 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 		return version_compare($subject, $this->getExpected(), '<=');
 	}
 
+	public function keyExists($subject) {
+		if (!is_array($subject)) {
+			return false;
+		}
+		return array_key_exists($this->getExpected(), $subject);
+	}
+
+	public function keyMatches($subject) {
+		if (!is_array($subject)) {
+			return false;
+		}
+		foreach($subject as $key=>$value) {
+			if (preg_match($this->getExpected(), $key))
+				return true;
+		}
+		return false;
+	}
+
+	public function exists($subject) {
+		return isset($subject);
+	}
+
 	/**
 	 * @return mixed
 	 */
@@ -1240,7 +1351,7 @@ class wfWAFRuleComparison implements wfWAFRuleInterface {
 	 * @return mixed
 	 */
 	public function getFailedSubjects() {
-		return $this->failedSubjects;
+		return (array)$this->failedSubjects;
 	}
 
 	/**
@@ -1368,10 +1479,18 @@ class wfWAFRuleComparisonGroup implements wfWAFRuleInterface {
 				}
 			}
 			if ($comparison instanceof wfWAFRuleComparison && $comparison->getResult()) {
-				foreach ($comparison->getFailedSubjects() as $failedSubject) {
+				if ($comparison->hasSubject()) {
+					foreach ($comparison->getFailedSubjects() as $failedSubject) {
+						$this->failedComparisons[] = new wfWAFRuleComparisonFailure(
+							$failedSubject['subject'], $failedSubject['value'], $comparison->getExpected(),
+							$comparison->getAction(), $failedSubject['multiplier'], $failedSubject['matches']
+						);
+					}
+				}
+				else {
 					$this->failedComparisons[] = new wfWAFRuleComparisonFailure(
-						$failedSubject['subject'], $failedSubject['value'], $comparison->getExpected(),
-						$comparison->getAction(), $failedSubject['multiplier'], $failedSubject['matches']
+						'', '', $comparison->getExpected(),
+						$comparison->getAction(), 1, array()
 					);
 				}
 			}
@@ -1682,17 +1801,26 @@ class wfWAFRuleComparisonSubject {
 		);
 	}
 
+	private function getRootValue($subject) {
+		if ($subject instanceof wfWAFRuleComparisonSubject) {
+			return $subject->getValue();
+		}
+		else {
+			return $this->getWAF()->getGlobal($subject);
+		}
+	}
+
 	/**
 	 * @return mixed|null
 	 */
 	public function getValue() {
 		$subject = $this->getSubject();
 		if (!is_array($subject)) {
-			return $this->runFilters($this->getWAF()->getGlobal($subject));
+			return $this->runFilters($this->getRootValue($subject), $subject);
 		}
-		if (is_array($subject) && count($subject) > 0) {
+		else if (count($subject) > 0) {
 			$globalKey = array_shift($subject);
-			return $this->runFilters($this->_getValue($subject, $this->getWAF()->getGlobal($globalKey)));
+			return $this->runFilters($this->_getValue($subject, $this->getRootValue($globalKey)));
 		}
 		return null;
 	}
@@ -1733,9 +1861,9 @@ class wfWAFRuleComparisonSubject {
 	private function runFilters($value) {
 		$filters = $this->getFilters();
 		if (is_array($filters)) {
-			foreach ($filters as $filter) {
-				if (method_exists($this, 'filter' . $filter)) {
-					$value = call_user_func(array($this, 'filter' . $filter), $value);
+			foreach ($filters as $filterArgs) {
+				if (method_exists($this, 'filter' . $filterArgs[0])) {
+					$value = call_user_func_array(array($this, 'filter' . $filterArgs[0]), array_merge(array($value), array_slice($filterArgs, 1)));
 				}
 			}
 		}
@@ -1753,11 +1881,65 @@ class wfWAFRuleComparisonSubject {
 		return $value;
 	}
 
+	public function filterReplace($value, $find, $replace) {
+		return str_replace($find, $replace, $value);
+	}
+
+	public function filterPregReplace($value, $pattern, $replacement, $limit=-1) {
+		return preg_replace($pattern, $replacement, $value, $limit);
+	}
+
+	private function getMatchingKeys($array, $patterns) {
+		if (!is_array($array))
+			return array();
+		$filtered = array();
+		$pattern = array_shift($patterns);
+		foreach ($array as $key=>$value) {
+			if (preg_match($pattern, $key)) {
+				if (empty($patterns)) {
+					$filtered[] = $value;
+				}
+				else {
+					$filtered = array_merge($filtered, $this->getMatchingKeys($value, $patterns));
+				}
+			}
+		}
+		return $filtered;
+	}
+
+	public function filterFilterKeys($values) {
+		$patterns = array_slice(func_get_args(), 1);
+		return $this->getMatchingKeys($values, $patterns);
+	}
+
+	public function filterJson($value) {
+		return wfWAFUtils::json_decode(@(string)$value, true);
+	}
+
+	private function renderSubject() {
+		$subjects = $this->getSubject();
+		if (is_array($subjects)) {
+			$rendered = array();
+			foreach ($subjects as $subject) {
+				if ($subject instanceof wfWAFRuleComparisonSubject) {
+					array_push($rendered, $subject->render());
+				}
+				else {
+					array_push($rendered, var_export($subject, true));
+				}
+			}
+			return sprintf('array(%s)', implode(', ', $rendered));
+		}
+		else {
+			return var_export($subjects, true);
+		}
+	}
+
 	/**
 	 * @return string
 	 */
 	public function render() {
-		return sprintf('%s::create($this, %s, %s)', get_class($this), var_export($this->getSubject(), true),
+		return sprintf('%s::create($this, %s, %s)', get_class($this), $this->renderSubject(),
 			var_export($this->getFilters(), true));
 	}
 
@@ -1787,7 +1969,7 @@ class wfWAFRuleComparisonSubject {
 		}
 
 		foreach ($this->getFilters() as $filter) {
-			$rule = $filter . '(' . $rule . ')';
+			$rule = $filter[0] . '(' . implode(',', array_merge(array($rule), array_slice($filter, 1))) . ')';
 		}
 		return $rule;
 	}

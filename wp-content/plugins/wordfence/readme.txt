@@ -3,8 +3,10 @@ Contributors: mmaunder, wfryan, wfmatt, wfmattr
 Tags: security, firewall, malware scanner, web application firewall, two factor authentication, block hackers, country blocking, clean hacked site, blocklist, waf, login security
 Requires at least: 3.9
 Requires PHP: 5.3
-Tested up to: 5.7
-Stable tag: 7.5.2
+Tested up to: 6.1
+Stable tag: 7.7.1
+License: GPLv3
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
 Secure your website with the most comprehensive WordPress security plugin. Firewall, malware scan, blocking, live traffic, login security & more.
 
@@ -145,7 +147,7 @@ No. Wordfence Security is extremely fast and uses techniques like caching its ow
 
 = What if my site has already been hacked? =
 
-Wordfence Security is able to repair core files, themes and plugins on sites where security is already compromised. You can follow this guide on [how to clean a hacked website](https://www.wordfence.com/docs/how-to-clean-a-hacked-wordpress-site-using-wordfence/) using Wordfence. However, please note that site security cannot be assured unless you do a full reinstall if your site has been hacked. We recommend you only use Wordfence Security to get your site into a running state in order to recover the data you need to do a full reinstall. If you need help repairing a hacked site, we offer an affordable, high-quality [site cleaning service](https://www.wordfence.com/wordfence-site-cleanings/) that includes a Premium key for a year.
+Wordfence Security is able to repair core files, themes and plugins on sites where security is already compromised. You can follow this guide on [how to clean a hacked website using Wordfence](https://www.wordfence.com/docs/how-to-clean-a-hacked-wordpress-site-using-wordfence/). If you are cleaning your own site after a hack, note that site security cannot be assured unless you do a full reinstall if your site has been hacked. We recommend you only use Wordfence Security to get your site into a running state in order to recover the data you need to do a full reinstall. If you need help with a security issue, check out [Wordfence Care](https://www.wordfence.com/products/wordfence-care/), which offers hands-on support from our team, including dealing with a hacked site. For mission-critical sites, check out [Wordfence Response](https://www.wordfence.com/products/wordfence-response/).
 
 = Does Wordfence Security support IPv6? =
 
@@ -157,15 +159,15 @@ Yes. WordPress Multi-Site is fully supported. Using Wordfence you can scan every
 
 = What support options are available for Wordfence users? =
 
-Providing excellent customer service is very important to us.  We offer help to all our customers whether you are using the Premium or free version of Wordfence.  For help with the free version, you can post in our [forum](https://wordpress.org/support/plugin/wordfence) where we have dedicated staff responding to questions. If you need faster or more in-depth help, Premium customers can submit a [support ticket](https://support.wordfence.com/support/home) to our Premium support team.
+Providing excellent customer service is very important to us. Our free users receive volunteer-level support in our [support forums](https://wordpress.org/support/plugin/wordfence). [Wordfence Premium](https://www.wordfence.com/products/wordfence-premium/) customers get paid ticket-based support. [Wordfence Care](https://www.wordfence.com/products/wordfence-care/) customers receive hands-on support including help with security incidents and a yearly security audit. [Wordfence Response](https://www.wordfence.com/products/wordfence-response/) customers get 24/7/365 support from our incident response team, with a 1 hour response time, and a maximum of 24 hours to resolve a security issue.
 
 = Where can I learn more about WordPress security? =
 
 Designed for every skill level, [The WordPress Security Learning Center](https://www.wordfence.com/learn/) is dedicated to deepening users’ understanding of security best practices by providing free access to entry-level articles, in-depth articles, videos, industry survey results, graphics and more.
 
-= Where can I find the Wordfence Terms of Use and Privacy Policy? =
+= Where can I find the Wordfence Terms of Service and Privacy Policy? =
 
-These are available on our website: [Terms of Use](https://www.wordfence.com/terms-of-use/) and [Privacy Policy](https://www.wordfence.com/privacy-policy/)
+These are available on our website: [Terms of Service](https://www.wordfence.com/terms-of-service/) and [Privacy Policy](https://www.wordfence.com/privacy-policy/)
 
 == Screenshots ==
 
@@ -182,6 +184,139 @@ Secure your website with Wordfence.
 9. Logging in is easy with Wordfence 2FA.
 
 == Changelog ==
+
+= 7.7.1 - October 4, 2022 =
+* Fix: Prevented scan resume attempts from repeating indefinitely when the initial scan stage fails
+
+= 7.7.0 - October 3, 2022 =
+* Improvement: Added configurable scan resume functionality to prevent scan failures on sites with intermittent connectivity issues
+* Improvement: Added new scan result for vulnerabilities found in plugins that do not have patched versions available via WordPress.org
+* Improvement: Implemented stand-alone MMDB reader for IP address lookups to prevent plugin conflicts and support additional PHP versions
+* Improvement: Added option to disable looking up IP address locations via the Wordfence API
+* Improvement: Prevented successful logins from resetting brute force counters
+* Improvement: Clarified IPv6 diagnostic
+* Improvement: Included maximum number of days in live traffic option text
+* Fix: Made timezones consistent on firewall page
+* Fix: Added "Use only IPv4 to start scans" option to search
+* Fix: Prevented deprecation notices on PHP 8.1 when emailing the activity log
+* Fix: Prevented warning on PHP 8 related to process owner diagnostic
+* Fix: Prevented PHP Code Sniffer false positive related to T_BAD_CHARACTER
+* Fix: Removed unsupported beta feed option
+
+= 7.6.2 - September 19, 2022 =
+* Improvement: Hardened 2FA login flow to reduce exposure in cases where an attacker is able to obtain privileged information from the database
+
+= 7.6.1 - September 6, 2022 =
+* Fix: Prevented XSS that would have required admin privileges to exploit (CVE-2022-3144)
+
+= 7.6.0 - July 28, 2022 =
+* Improvement: Added option to start scans using only IPv4
+* Improvement: Added diagnostic for internal IPv6 connectivity to site
+* Improvement: Added AUTOMATIC_UPDATER_DISABLED diagnostic
+* Improvement: Updated password strength check
+* Improvement: Added support for scanning plugin/theme files in when using the WP_CONTENT_DIR/WP_PLUGIN_DIR constants
+* Improvement: Updated GeoIP database
+* Improvement: Made DISABLE_WP_CRON diagnostic more clear
+* Improvement: Added "Hostname" to Live Traffic message displayed for hostname blocking
+* Improvement: Improved compatibility with Flywheel hosting
+* Improvement: Adopted semantic versioning
+* Improvement: Added support for dynamic cookie redaction patterns when logging requests
+* Fix: Prevented scanned paths from being displayed as skipped in rare cases
+* Fix: Corrected indexed files count in scan messages
+* Fix: Prevented overlapping AJAX requests when viewing Live Traffic on slower servers
+* Fix: Corrected WP_DEBUG_DISPLAY diagnostic
+* Fix: Prevented extraneous warnings caused by DNS resolution failures
+* Fix: Corrected display issue with Save/Cancel buttons on All Options page
+* Fix: Prevented errors caused by WHOIS searches for invalid values
+
+= 7.5.11 - June 14, 2022 =
+* Improvement: Added option to toggle display of last login column on WP Users page
+* Improvement: Improved autocomplete support for 2FA code on Apple devices
+* Improvement: Prevented Batcache from caching block pages
+* Improvement: Updated GeoIP database
+* Fix: Prevented extraneous scan results when non-existent paths are configured using UPLOADS and related constants
+* Fix: Corrected issue that prevented reCAPTCHA scores from being recorded
+* Fix: Prevented invalid JSON setting values from triggering fatal errors
+* Fix: Made text domains consistent for translation support
+* Fix: Clarified that allowlisted IP addresses also bypass reCAPTCHA
+
+= 7.5.10 - May 17, 2022 =
+* Improvement: Improved scan support for sites with non-standard directory structures
+* Improvement: Increased accuracy of executable PHP upload detection
+* Improvement: Addressed various deprecation notices with PHP 8.1
+* Improvement: Improved handling of invalidated license keys
+* Fix: Corrected lost password redirect URL when used with WooCommerce
+* Fix: Prevented errors when live traffic data exceeds database column length
+* Fix: Prevented bulk password resets from locking out admins
+* Fix: Corrected issue that prevented saving country blocking settings in certain cases
+* Change: Updated copyright information
+
+= 7.5.9 - March 22, 2022 =
+* Improvement: Updated GeoIP database
+* Improvement: Removed blocking data update logic in order to reduce timeouts
+* Improvement: Increased timeout value for API calls in order to reduce timeouts
+* Improvement: Clarified notification count on Wordfence menu
+* Improvement: Improved scan compatibility with WooCommerce
+* Improvement: Added messaging when application passwords are disabled
+* Fix: Prevented warnings and errors when constants are defined based on the value of other constants in wp-config.php
+* Fix: Corrected redundant escaping that prevented viewing or repairing files in scan results
+
+= 7.5.8 - February 1, 2022 =
+* Launch of Wordfence Care and Wordfence Response
+
+= 7.5.7 - November 22, 2021 =
+* Improvement: Made preliminary changes for compatibility with PHP 8.1
+* Change: Added GPLv3 license and updated EULA
+
+= 7.5.6 - October 18, 2021 =
+* Fix: Prevented login errors with WooCommerce integration when manual username entry is enabled on the WooCommerce registration form
+* Fix: Corrected theme incompatibilities with WooCommerce integration
+
+= 7.5.5 - August 16, 2021 =
+* Improvement: Enhanced accessibility
+* Improvement: Replaced regex in scan log with signature ID
+* Improvement: Updated Knockout JS dependency to version 3.5.1
+* Improvement: Removed PHP 8 compatibility notice
+* Improvement: Added NTP status for Login Security to Diagnostics
+* Improvement: Updated plugin headers for compatibility with WordPress 5.8
+* Improvement: Updated Nginx documentation links to HTTPS
+* Improvement: Updated IP address geolocation database
+* Improvement: Expanded WAF SQL syntax support
+* Improvement: Added optional constants to configure WAF database connection
+* Improvement: Added support for matching punycode domain names
+* Improvement: Updated Wordfence install count
+* Improvement: Deprecated support for WordPress versions older than 4.4.0
+* Improvement: Added warning messages when blocking U.S.
+* Improvement: Added MYSQLI_CLIENT_SSL support to WAF database connection
+* Improvement: Added 2FA and reCAPTCHA support for WooCommerce login and registration forms
+* Improvement: Added option to require 2FA for any role
+* Improvement: Added logic to automatically disable NTP after repeated failures and option to manually disable NTP
+* Improvement: Updated reCAPTCHA setup note
+* Fix: Prevented issue where country blocking changes are not saved
+* Fix: Corrected string placeholder
+* Fix: Added missing text domain to translation calls
+* Fix: Corrected warning about sprintf arguments on Central setup page
+* Fix: Prevented lost password functionality from revealing valid logins
+
+= 7.5.4 - June 7, 2021 =
+
+* Fix: Resolve conflict with woocommerce-gateway-amazon-payments-advanced plugin
+
+= 7.5.3 - May 10, 2021 =
+
+* Improvement: Expanded WAF capabilities including better JSON and user permission handling
+* Improvement: Switched to relative paths in WAF auto_prepend file to increase portability
+* Improvement: Eliminated unnecessary calls to Wordfence servers
+* Fix: Prevented errors on PHP 8.0 when disk_free_space and/or disk_total_space are included in disabled_functions
+* Fix: Fixed PHP notices caused by unexpected plugin version data
+* Fix: Gracefully handle unexpected responses from Wordfence servers
+* Fix: Time field now displays correctly on "See Recent Traffic" overlay
+* Fix: Corrected typo on Diagnostics page
+* Fix: Corrected IP counts on activity report
+* Fix: Added missing line break in scan result emails
+* Fix: Sending test activity report now provides success/failure response
+* Fix: Reduced SQLi false positives caused by comma-separated strings
+* Fix: Fixed JS error when resolving last scan result
 
 = 7.5.2 - March 24, 2021 =
 

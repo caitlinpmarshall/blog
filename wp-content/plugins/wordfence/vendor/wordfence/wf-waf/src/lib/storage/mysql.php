@@ -19,6 +19,7 @@ class wfWAFStorageMySQL implements wfWAFStorageInterface {
 	private $dataChanged = false;
 	private $data = array();
 	private $dataToSave = array();
+	private $shutdownRegistry = null;
 
 	public $installing = false;
 
@@ -26,9 +27,10 @@ class wfWAFStorageMySQL implements wfWAFStorageInterface {
 	 * @param wfWAFStorageEngineDatabase $engine
 	 * @param string $tablePrefix
 	 */
-	public function __construct($engine, $tablePrefix = 'wp_') {
+	public function __construct($engine, $tablePrefix = 'wp_', $shutdownRegistry = null) {
 		$this->db = $engine;
 		$this->tablePrefix = $tablePrefix;
+		$this->shutdownRegistry = $shutdownRegistry === null ? wfShutdownRegistry::getDefaultInstance() : $shutdownRegistry;
 	}
 
 	public function usingLowercase() {
@@ -100,6 +102,8 @@ class wfWAFStorageMySQL implements wfWAFStorageInterface {
 		$data = array();
 		foreach ($results as $row) {
 			$actionData = wfWAFUtils::json_decode($row['actionData'], true);
+			if (!is_array($actionData))
+				$actionData = array();
 			$data[] = array(
 				$row['attackLogTime'],
 				$row['ctime'],
@@ -137,6 +141,8 @@ class wfWAFStorageMySQL implements wfWAFStorageInterface {
 		$data = array();
 		foreach ($results as $row) {
 			$actionData = wfWAFUtils::json_decode($row['actionData'], true);
+			if (!is_array($actionData))
+				$actionData = array();
 			$data[] = array(
 				$row['attackLogTime'],
 				$row['ctime'],
@@ -210,6 +216,16 @@ class wfWAFStorageMySQL implements wfWAFStorageInterface {
 			}
 		}
 
+		$attackData = array(
+				'failedRules'     => $failedRulesString,
+				'paramKey'        => base64_encode($failedParamKey),
+				'paramValue'      => base64_encode($failedParamValue),
+				'path'            => base64_encode($request->getPath()),
+				'fullRequest'     => base64_encode($request),
+				'requestMetadata' => $request->getMetadata(),
+		);
+		$attackDataJson = wfWAFUtils::json_encode_limited($attackData, 65535, array('fullRequest', 'paramValue'));
+
 		$row = array(
 			'attackLogTime'     => microtime(true),
 			'ctime'             => $request->getTimestamp(),
@@ -222,20 +238,13 @@ class wfWAFStorageMySQL implements wfWAFStorageInterface {
 			'referer'           => $referer,
 			'UA'                => $ua,
 			'action'            => $action,
-			'actionData'        => wfWAFUtils::json_encode(array(
-				'failedRules'     => $failedRulesString,
-				'paramKey'        => base64_encode($failedParamKey),
-				'paramValue'      => base64_encode($failedParamValue),
-				'path'            => base64_encode($request->getPath()),
-				'fullRequest'     => base64_encode($request),
-				'requestMetadata' => $request->getMetadata(),
-			)),
+			'actionData'        => $attackDataJson
 		);
 
 		try {
 			return $this->db->insert($table, $row);
 		} catch (wfWAFStorageEngineMySQLiException $e) { // Let the firewall block the request without logging.
-			error_log($e->getMessage());
+			error_log('Failed to log attack data: ' . $e->getMessage());
 			return false;
 		}
 	}
@@ -345,7 +354,7 @@ class wfWAFStorageMySQL implements wfWAFStorageInterface {
 
 		if (!$this->dataChanged && $changedConfigValue) {
 			$this->dataChanged = array($category, $key, true);
-			register_shutdown_function(array($this, 'saveConfig'));
+			$this->shutdownRegistry->register(array($this, 'saveConfig'), wfShutdownRegistry::PRIORITY_LAST);
 		}
 		if ($changedConfigValue) {
 			$this->dataToSave[$category][$key] = $value;
@@ -566,6 +575,8 @@ class wfWAFStorageMySQL implements wfWAFStorageInterface {
 				'serverIPs',
 				'disableWAFIPBlocking',
 				'advancedBlockingEnabled',
+				'blockCustomText',
+				'whitelistedServiceIPs'
 			),
 		);
 	}
@@ -617,11 +628,16 @@ class wfWAFStorageMySQL implements wfWAFStorageInterface {
 		}
 		return $table;
 	}
+
+	public function getDescription() {
+		return __('mysqli', 'wordfence');
+	}
+
 }
 
 interface wfWAFStorageEngineDatabase {
 
-	public function connect($user, $password, $database, $host, $port = null, $socket = null);
+	public function connect($user, $password, $database, $host, $port = null, $socket = null, $flags = 0);
 
 	public function setCharset($charset, $collation);
 
@@ -693,9 +709,19 @@ class wfWAFStorageEngineMySQLi implements wfWAFStorageEngineDatabase {
 	 * @return mysqli
 	 * @throws wfWAFStorageEngineMySQLiException
 	 */
-	public function connect($user, $password, $database, $host, $port = null, $socket = null) {
-		$this->dbh = @mysqli_connect($host, $user, $password, $database, $port, $socket);
-		if (!$this->dbh) {
+	public function connect($user, $password, $database, $host, $port = null, $socket = null, $flags = 0, $sslOptions = null) {
+		$this->dbh = mysqli_init();
+		if (!empty($sslOptions) && ($flags & (MYSQLI_CLIENT_SSL | MYSQLI_CLIENT_SSL_DONT_VERIFY_SERVER_CERT))) {
+			mysqli_ssl_set(
+				$this->dbh,
+				array_key_exists('key', $sslOptions) ? $sslOptions['key'] : null,
+				array_key_exists('certificate', $sslOptions) ? $sslOptions['certificate'] : null,
+				array_key_exists('ca_certificate', $sslOptions) ? $sslOptions['ca_certificate'] : null,
+				array_key_exists('ca_path', $sslOptions) ? $sslOptions['ca_path'] : null,
+				array_key_exists('cipher_algos', $sslOptions) ? $sslOptions['cipher_algos'] : null
+			);
+		}
+		if (!@mysqli_real_connect($this->dbh, $host, $user, $password, $database, $port, $socket, $flags)) {
 			$error = error_get_last();
 			throw new wfWAFStorageEngineMySQLiException('Unable to connect to database: ' . $error['message'], $error['type']);
 		}

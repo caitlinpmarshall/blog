@@ -33,7 +33,7 @@ if (!isset($collapseable)) {
 							$subtitle .= '<br><br>';
 							$subtitle .= wp_kses(__('<span class="wf-red-dark">Warning:</span> You are running the LiteSpeed web server and Wordfence can\'t determine whether "noabort" is set. Please verify that the environmental variable "noabort" is set for the local site, or the server\'s global External Application Abort is set to "No Abort".', 'wordfence'), array('span'=>array('class'=>array())));
 							$subtitle .= '<br>';
-							$subtitle .= '<a href="' . wfSupportController::esc_supportURL(wfSupportController::ITEM_DASHBOARD_OPTION_LITESPEED_WARNING) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Please read this article in our FAQ to make an important change that will ensure your site stability during an update.', 'wordfence') . '</a>';
+							$subtitle .= '<a href="' . wfSupportController::esc_supportURL(wfSupportController::ITEM_DASHBOARD_OPTION_LITESPEED_WARNING) . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Please read this article in our FAQ to make an important change that will ensure your site stability during an update.', 'wordfence') . '<span class="screen-reader-text"> (' . esc_html__('opens in new tab', 'wordfence') . ')</span></a>';
 						}
 						
 						echo wfView::create('options/option-toggled', array(
@@ -61,6 +61,19 @@ if (!isset($collapseable)) {
 					<li>
 						<?php
 						echo wfView::create('dashboard/option-howgetips')->render();
+						?>
+					</li>
+					<li>
+						<?php
+						echo wfView::create('options/option-toggled', array(
+							'optionName' => 'enableRemoteIpLookup',
+							'enabledValue' => 1,
+							'disabledValue' => 0,
+							'value' => wfConfig::get('enableRemoteIpLookup', true) ? 1 : 0,
+							'title' => __('Look up visitor IP locations via Wordfence servers', 'wordfence'),
+							'subtitle' => __('If this option is disabled, Wordfence can look up countries for visitor IP addresses using a local database, but cannot look up regions or cities', 'wordfence'),
+							'helpLink' => wfSupportController::supportURL(wfSupportController::ITEM_GENERAL_REMOTE_IP_LOOKUP)
+						))->render();
 						?>
 					</li>
 					<li>
