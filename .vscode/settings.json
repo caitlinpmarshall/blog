@@ -1,0 +1,11 @@
+{
+    "liveSassCompile.settings.forceBaseDirectory": "/wp-content/themes/astra-child",
+    "liveSassCompile.settings.formats": [
+        {
+            "format": "expanded",
+            "extensionName": ".css",
+            "savePath": "/wp-content/themes"
+        }
+    ],
+    "liveSassCompile.settings.watchOnLaunch": false
+}
