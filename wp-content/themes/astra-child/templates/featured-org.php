@@ -8,8 +8,7 @@
  * @since 1.0.0
  */
 
-$id = 'featured-' . $block['id'];
-$block['className'] = "featured-org";
+$classname = "featured-org";
 $hero_image = get_field('hero_image');
 $organization_name = get_field('organization_name');
 $website_link = get_field('website_link');
@@ -19,7 +18,7 @@ $organization_description = get_field('organization_description');
 get_header();
 ?>
 
-<section class="section-featured <?php echo $block['className'] ?>" id="<?php echo $id; ?>">
+<section class="section-featured <?php echo $classname ?>">
 	<div class="container">
 		<div class="d-flex align-items-center">
 			<?php
@@ -38,7 +37,10 @@ get_header();
 				<?php } ?>
 				<?php
 				if (!empty($focus_areas)) { ?>
-					<p class="focus-areas">Areas of focus: <?php echo $focus_areas; ?></p>
+					<div class="focus-areas">
+						<p>Areas of focus:</p>
+						<p><?php echo $focus_areas; ?></p>
+					</div>
 				<?php } ?>
 				<?php
 				if (!empty($website_link)) { ?>
