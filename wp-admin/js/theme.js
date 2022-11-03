@@ -404,11 +404,7 @@ themes.view.Theme = wp.Backbone.View.extend({
 		var data = this.model.toJSON();
 
 		// Render themes using the html template.
-		this.$el.html( this.html( data ) ).attr({
-			tabindex: 0,
-			'aria-describedby' : data.id + '-action ' + data.id + '-name',
-			'data-slug': data.id
-		});
+		this.$el.html( this.html( data ) ).attr( 'data-slug', data.id );
 
 		// Renders active theme styles.
 		this.activeTheme();
@@ -626,6 +622,9 @@ themes.view.Theme = wp.Backbone.View.extend({
 			if ( _this.model.get( 'id' ) === response.slug ) {
 				_this.model.set( { 'installed': true } );
 			}
+			if ( response.blockTheme ) {
+				_this.model.set( { 'block_theme': true } );
+			}
 		} );
 
 		wp.updates.installTheme( {
@@ -764,7 +763,7 @@ themes.view.Details = wp.Backbone.View.extend({
 
 				// Return focus to the theme div.
 				if ( themes.focusedTheme ) {
-					themes.focusedTheme.trigger( 'focus' );
+					themes.focusedTheme.find('.more-details').trigger( 'focus' );
 				}
 			});
 		}
@@ -952,7 +951,7 @@ themes.view.Preview = themes.view.Details.extend({
 
 			// Return focus to the theme div.
 			if ( themes.focusedTheme ) {
-				themes.focusedTheme.trigger( 'focus' );
+				themes.focusedTheme.find('.more-details').trigger( 'focus' );
 			}
 		}).removeClass( 'iframe-ready' );
 
@@ -1695,7 +1694,13 @@ themes.view.Installer = themes.view.Appearance.extend({
 	browse: function( section ) {
 		// Create a new collection with the proper theme data
 		// for each section.
-		this.collection.query( { browse: section } );
+		if ( 'block-themes' === section ) {
+			// Get the themes by sending Ajax POST request to api.wordpress.org/themes
+			// or searching the local cache.
+			this.collection.query( { tag: 'full-site-editing' } );
+		} else {
+			this.collection.query( { browse: section } );
+		}
 	},
 
 	// Sorting navigation.
@@ -1965,7 +1970,7 @@ themes.RunInstaller = {
 		// Set up the view.
 		// Passes the default 'section' as an option.
 		this.view = new themes.view.Installer({
-			section: 'featured',
+			section: 'popular',
 			SearchView: themes.view.InstallerSearch
 		});
 
@@ -2032,12 +2037,12 @@ themes.RunInstaller = {
 		/*
 		 * Handles sorting / browsing routes.
 		 * Also handles the root URL triggering a sort request
-		 * for `featured`, the default view.
+		 * for `popular`, the default view.
 		 */
 		themes.router.on( 'route:sort', function( sort ) {
 			if ( ! sort ) {
-				sort = 'featured';
-				themes.router.navigate( themes.router.baseUrl( '?browse=featured' ), { replace: true } );
+				sort = 'popular';
+				themes.router.navigate( themes.router.baseUrl( '?browse=popular' ), { replace: true } );
 			}
 			self.view.sort( sort );
 
@@ -2061,7 +2066,7 @@ themes.RunInstaller = {
 };
 
 // Ready...
-$( document ).ready(function() {
+$( function() {
 	if ( themes.isInstall ) {
 		themes.RunInstaller.init();
 	} else {
@@ -2089,7 +2094,7 @@ $( document ).ready(function() {
 })( jQuery );
 
 // Align theme browser thickbox.
-jQuery(document).ready( function($) {
+jQuery( function($) {
 	window.tb_position = function() {
 		var tbWindow = $('#TB_window'),
 			width = $(window).width(),
