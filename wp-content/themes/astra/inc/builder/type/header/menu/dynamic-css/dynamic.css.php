@@ -196,11 +196,13 @@ function astra_hb_menu_dynamic_css( $dynamic_css, $dynamic_css_filtered = '' ) {
 				'font-size' => astra_get_font_css_value( $menu_font_size_tablet, $menu_font_size_tablet_unit ),
 			),
 			$mobile_selector . ' .main-header-menu .menu-item > .menu-link' => array(
-				'color'          => $menu_resp_color_tablet,
 				'padding-top'    => astra_responsive_spacing( $menu_spacing, 'top', 'tablet' ),
 				'padding-bottom' => astra_responsive_spacing( $menu_spacing, 'bottom', 'tablet' ),
 				'padding-left'   => astra_responsive_spacing( $menu_spacing, 'left', 'tablet' ),
 				'padding-right'  => astra_responsive_spacing( $menu_spacing, 'right', 'tablet' ),
+			),
+			$selector . ' .main-header-menu .menu-item > .menu-link' => array(
+				'color' => $menu_resp_color_tablet,
 			),
 			$selector . ' .menu-item > .ast-menu-toggle' => array(
 				'color' => $menu_resp_color_tablet,
@@ -243,11 +245,13 @@ function astra_hb_menu_dynamic_css( $dynamic_css, $dynamic_css_filtered = '' ) {
 				'font-size' => astra_get_font_css_value( $menu_font_size_mobile, $menu_font_size_mobile_unit ),
 			),
 			$mobile_selector . ' .main-header-menu .menu-item > .menu-link' => array(
-				'color'          => $menu_resp_color_mobile,
 				'padding-top'    => astra_responsive_spacing( $menu_spacing, 'top', 'mobile' ),
 				'padding-bottom' => astra_responsive_spacing( $menu_spacing, 'bottom', 'mobile' ),
 				'padding-left'   => astra_responsive_spacing( $menu_spacing, 'left', 'mobile' ),
 				'padding-right'  => astra_responsive_spacing( $menu_spacing, 'right', 'mobile' ),
+			),
+			$selector . ' .main-header-menu .menu-item > .menu-link' => array(
+				'color' => $menu_resp_color_mobile,
 			),
 			$selector . ' .menu-item  > .ast-menu-toggle' => array(
 				'color' => $menu_resp_color_mobile,
@@ -309,5 +313,58 @@ function astra_hb_menu_dynamic_css( $dynamic_css, $dynamic_css_filtered = '' ) {
 
 	}
 
+	$dynamic_css .= astra_menu_hover_style_css();
 	return $dynamic_css;
+}
+
+/**
+ * Load Menu hover style static CSS if any one of the menu hover style is selected.
+ * 
+ * @return string
+ * @since 3.5.0
+ */
+function astra_menu_hover_style_css() {
+	$hover_style_flg = false;
+	$menu_hover_css  = '';
+	for ( $index = 1; $index <= Astra_Builder_Helper::$num_of_header_menu; $index++ ) {
+		if ( '' !== astra_get_option( 'header-menu' . $index . '-menu-hover-animation' ) ) {
+			$hover_style_flg = true;
+		}
+	}
+
+	if ( true === $hover_style_flg ) {
+		$menu_hover_css = '
+		.ast-desktop .ast-menu-hover-style-underline > .menu-item > .menu-link:before,
+		.ast-desktop .ast-menu-hover-style-overline > .menu-item > .menu-link:before {
+		  content: "";
+		  position: absolute;
+		  width: 100%;
+		  right: 50%;
+		  height: 1px;
+		  background-color: transparent;
+		  transform: scale(0, 0) translate(-50%, 0);
+		  transition: transform .3s ease-in-out, color .0s ease-in-out;
+		}
+		
+		.ast-desktop .ast-menu-hover-style-underline > .menu-item:hover > .menu-link:before,
+		.ast-desktop .ast-menu-hover-style-overline > .menu-item:hover > .menu-link:before {
+		  width: calc(100% - 1.2em);
+		  background-color: currentColor;
+		  transform: scale(1, 1) translate(50%, 0);
+		}
+		
+		.ast-desktop .ast-menu-hover-style-underline > .menu-item > .menu-link:before {
+		  bottom: 0;
+		}
+		
+		.ast-desktop .ast-menu-hover-style-overline > .menu-item > .menu-link:before {
+		  top: 0;
+		}
+		
+		.ast-desktop .ast-menu-hover-style-zoom > .menu-item > .menu-link:hover {
+		  transition: all .3s ease;
+		  transform: scale(1.2);
+		}';
+	}
+	return Astra_Enqueue_Scripts::trim_css( $menu_hover_css );
 }

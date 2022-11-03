@@ -126,7 +126,7 @@ if ( ! class_exists( 'Astra_LifterLMS' ) ) :
 			if ( is_lesson() ) {
 				remove_action( 'lifterlms_single_lesson_after_summary', 'lifterlms_template_lesson_navigation', 20 );
 				remove_action( 'astra_entry_after', 'astra_single_post_navigation_markup' );
-				if ( 'yes' !== apply_filters( 'llms_blocks_is_post_migrated', get_post_meta( get_the_ID(), '_llms_blocks_migrated', true ), get_the_ID() ) ) {
+				if ( 'yes' !== apply_filters( 'llms_blocks_is_post_migrated', get_post_meta( get_the_ID(), '_llms_blocks_migrated', true ), get_the_ID() ) ) { // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 					add_action( 'astra_entry_after', 'lifterlms_template_lesson_navigation' );
 				}
 			}
@@ -182,6 +182,7 @@ if ( ! class_exists( 'Astra_LifterLMS' ) ) :
 			 */
 			require ASTRA_THEME_DIR . 'inc/compatibility/lifterlms/customizer/sections/class-astra-lifter-container-configs.php';
 			require ASTRA_THEME_DIR . 'inc/compatibility/lifterlms/customizer/sections/class-astra-lifter-sidebar-configs.php';
+			require ASTRA_THEME_DIR . 'inc/compatibility/lifterlms/customizer/sections/layout/class-astra-lifter-general-configs.php';
 			// @codingStandardsIgnoreEnd WPThemeReview.CoreFunctionality.FileInclude.FileIncludeFound
 		}
 
@@ -232,7 +233,7 @@ if ( ! class_exists( 'Astra_LifterLMS' ) ) :
 			if ( get_post_meta( get_the_ID(), '_llms_display_reviews', true ) ) {
 				?>
 				<div id="old_reviews">
-				<h3><?php echo apply_filters( 'lifterlms_reviews_section_title', _e( 'What Others Have Said', 'astra' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h3>
+				<h3><?php echo apply_filters( 'lifterlms_reviews_section_title', _e( 'What Others Have Said', 'astra' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound ?></h3>
 				<?php
 				$args        = array(
 					'posts_per_page'   => get_post_meta( get_the_ID(), '_llms_num_reviews', true ), // phpcs:ignore WPThemeReview.CoreFunctionality.PostsPerPage.posts_per_page_posts_per_page, WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
@@ -251,7 +252,7 @@ if ( ! class_exists( 'Astra_LifterLMS' ) ) :
 				);
 
 				if ( has_filter( 'llms_review_custom_styles' ) ) {
-					$styles = apply_filters( 'llms_review_custom_styles', $styles );
+					$styles = apply_filters( 'llms_review_custom_styles', $styles ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				}
 
 				foreach ( $posts_array as $post ) {
@@ -298,7 +299,7 @@ if ( ! class_exists( 'Astra_LifterLMS' ) ) :
 				if ( get_post_meta( get_the_ID(), '_llms_multiple_reviews_disabled', true ) && $posts_array ) {
 					?>
 					<div id="thank_you_box">
-						<h2><?php echo apply_filters( 'llms_review_thank_you_text', __( 'Thank you for your review!', 'astra' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h2>
+						<h2><?php echo apply_filters( 'llms_review_thank_you_text', __( 'Thank you for your review!', 'astra' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound ?></h2>
 					</div>
 					<?php
 				} else {
@@ -315,7 +316,7 @@ if ( ! class_exists( 'Astra_LifterLMS' ) ) :
 						<input type="submit" class="button" value="<?php esc_attr_e( 'Leave Review', 'astra' ); ?>" id="llms_review_submit_button">
 					</div>
 					<div id="thank_you_box" style="display:none;">
-						<h2><?php echo apply_filters( 'llms_review_thank_you_text', __( 'Thank you for your review!', 'astra' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h2>
+						<h2><?php echo apply_filters( 'llms_review_thank_you_text', __( 'Thank you for your review!', 'astra' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound ?></h2>
 					</div>
 					<?php
 				}
@@ -768,7 +769,7 @@ if ( ! class_exists( 'Astra_LifterLMS' ) ) :
 
 		/**
 		 * Llms single lesson static CSS move to dynamic to load conditionally.
-		 * 
+		 *
 		 * @since 3.3.0
 		 * @return string
 		 */
@@ -777,51 +778,51 @@ if ( ! class_exists( 'Astra_LifterLMS' ) ) :
 			.single-lesson.ast-separate-container .llms-lesson-preview .llms-lesson-link {
 				background: #fff;
 			}
-			  
+
 			.single-lesson.ast-separate-container .llms-lesson-preview .llms-lesson-link:hover {
 				background: #fafafa;
 			}
-			  
+
 			.single-lesson .ast-article-single .llms-lesson-button-wrapper {
 				font-weight: 600;
 			}
-			  
+
 			.single-lesson .ast-article-single .llms-lesson-button-wrapper .llms-complete-lesson-form .llms-field-button:before {
 				content: "\2714";
 				margin-right: .5em;
 			}
-			  
+
 			.single-lesson .llms-course-navigation {
 				padding: 2em 0 0;
 				border-top: 1px solid #eeeeee;
 			}
-			  
+
 			.single-lesson .llms-course-navigation .llms-lesson-preview {
 				vertical-align: top;
 				margin-top: 0;
 			}
-			  
+
 			.single-lesson .llms-course-navigation .llms-lesson-preview .llms-lesson-link {
 				padding-left: 20px;
 				padding-right: 20px;
 			}
-			  
+
 			.single-lesson .llms-course-navigation .llms-prev-lesson h6.llms-pre-text:before {
 				content: "\2190";
 				margin-right: .5em;
 			}
-			  
+
 			.single-lesson .llms-course-navigation .llms-back-to-course:first-child h6.llms-pre-text:before {
 				content: "\2190";
 				margin-right: .5em;
 			}
-			  
+
 			.single-lesson .llms-course-navigation .llms-prev-lesson ~ .llms-back-to-course h6.llms-pre-text:after,
 			.single-lesson .llms-course-navigation .llms-next-lesson h6.llms-pre-text:after {
 				content: "\2192";
 				margin-left: 5px;
 			}
-			  
+
 			.single-lesson .llms-course-navigation .llms-prev-lesson ~ .llms-back-to-course .llms-lesson-title,
 			.single-lesson .llms-course-navigation .llms-prev-lesson ~ .llms-back-to-course .llms-lesson-excerpt,
 			.single-lesson .llms-course-navigation .llms-prev-lesson ~ .llms-back-to-course h6.llms-pre-text,
@@ -830,7 +831,7 @@ if ( ! class_exists( 'Astra_LifterLMS' ) ) :
 			.single-lesson .llms-course-navigation .llms-next-lesson h6.llms-pre-text {
 				text-align: right;
 			}
-			  
+
 			@media (max-width: 544px) {
 				.single-lesson .llms-course-navigation {
 				  padding-top: 1.5em;

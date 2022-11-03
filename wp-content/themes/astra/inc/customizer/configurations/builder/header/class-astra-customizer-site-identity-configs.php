@@ -51,6 +51,21 @@ if ( class_exists( 'Astra_Customizer_Config_Base' ) ) {
 				),
 
 				/**
+				* Link to the astra logo and site title settings.
+				*/
+				array(
+					'name'           => ASTRA_THEME_SETTINGS . '[logo-title-settings-link]',
+					'type'           => 'control',
+					'control'        => 'ast-customizer-link',
+					'section'        => 'astra-site-identity',
+					'priority'       => 5,
+					'link_type'      => 'section',
+					'is_button_link' => true,
+					'linked'         => 'title_tagline',
+					'link_text'      => __( 'Site Title & Logo Settings', 'astra' ),
+				),
+
+				/**
 				 * Option: Header Builder Tabs
 				 */
 				array(
@@ -66,10 +81,10 @@ if ( class_exists( 'Astra_Customizer_Config_Base' ) ) {
 				 * Option: Display Title
 				 */
 				array(
-					'name'      => ASTRA_THEME_SETTINGS . '[display-site-title]',
+					'name'      => ASTRA_THEME_SETTINGS . '[display-site-title-responsive]',
 					'type'      => 'control',
-					'control'   => 'ast-toggle-control',
-					'default'   => astra_get_option( 'display-site-title' ),
+					'control'   => 'ast-responsive-toggle-control',
+					'default'   => astra_get_option( 'display-site-title-responsive' ),
 					'section'   => 'title_tagline',
 					'title'     => __( 'Display Site Title', 'astra' ),
 					'priority'  => 7,
@@ -110,6 +125,22 @@ if ( class_exists( 'Astra_Customizer_Config_Base' ) ) {
 					'context'   => Astra_Builder_Helper::$design_tab,
 				),
 
+				
+				/**
+						 * Option: Divider
+						 */
+				array(
+					'name'     => ASTRA_THEME_SETTINGS . '[' . $_section . '-margin-divider]',
+					'section'  => $_section,
+					'title'    => __( 'Spacing', 'astra' ),
+					'type'     => 'control',
+					'control'  => 'ast-heading',
+					'priority' => 220,
+					'settings' => array(),
+					'context'  => Astra_Builder_Helper::$design_tab,
+					'divider'  => array( 'ast_class' => 'ast-section-spacing' ),
+				),
+
 				/**
 				 * Option: Margin Space
 				 */
@@ -132,6 +163,7 @@ if ( class_exists( 'Astra_Customizer_Config_Base' ) ) {
 						'left'   => __( 'Left', 'astra' ),
 					),
 					'context'           => Astra_Builder_Helper::$design_tab,
+					'divider'           => array( 'ast_class' => 'ast-section-spacing' ),
 				),
 
 			);

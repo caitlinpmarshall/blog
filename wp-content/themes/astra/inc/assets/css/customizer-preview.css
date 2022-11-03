@@ -90,17 +90,16 @@ body.customize-partial-edit-shortcuts-shown .customize-partial-edit-shortcut but
 }
 
 .elementor-page .customize-partial-edit-shortcut button {
-    padding: 3px !important;
     width: 26px !important;
     height: 26px !important;
     min-width: 26px !important;
     min-height: 26px !important;
-    border-radius: 50% !important;
+    border-radius: 2px !important;
     border: 1px solid #fff !important;
     box-shadow: none !important;
     text-shadow: none !important;
     padding: 3px !important;
- }
+}
 
 .customize-partial-edit-shortcut > button svg {
     min-width: 16px;
@@ -122,10 +121,10 @@ body.customize-partial-edit-shortcuts-shown .customize-partial-edit-shortcut but
 /**
  * Customizer Edit pencil - Set Position
  */
- .customize-partial-edit-shortcut-blogname button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-blogdescription button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-astra-settings-display-site-title button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-astra-settings-display-site-tagline button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-custom_logo button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-astra-settings-disable-primary-nav button.customize-partial-edit-shortcut-button {
+ .customize-partial-edit-shortcut-blogname button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-blogdescription button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-astra-settings-display-site-title-responsive button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-astra-settings-display-site-tagline-responsive button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-custom_logo button.customize-partial-edit-shortcut-button, .customize-partial-edit-shortcut-astra-settings-disable-primary-nav button.customize-partial-edit-shortcut-button, .ast-related-posts-title .customize-partial-edit-shortcut-button {
 	display: none;
 }
-.ast-site-title-wrap:hover .customize-partial-edit-shortcut-blogname button.customize-partial-edit-shortcut-button, .ast-site-title-wrap:hover .customize-partial-edit-shortcut-blogdescription button.customize-partial-edit-shortcut-button, .site-logo-img:hover .customize-partial-edit-shortcut-custom_logo button.customize-partial-edit-shortcut-button, .main-navigation:hover .customize-partial-edit-shortcut-astra-settings-disable-primary-nav button.customize-partial-edit-shortcut-button {
+.ast-site-title-wrap:hover .customize-partial-edit-shortcut-blogname button.customize-partial-edit-shortcut-button, .ast-site-title-wrap:hover .customize-partial-edit-shortcut-blogdescription button.customize-partial-edit-shortcut-button, .site-logo-img:hover .customize-partial-edit-shortcut-custom_logo button.customize-partial-edit-shortcut-button, .main-navigation:hover .customize-partial-edit-shortcut-astra-settings-disable-primary-nav button.customize-partial-edit-shortcut-button, .ast-related-posts-title:hover .customize-partial-edit-shortcut-button {
 	display: inline-block;
 }
 
@@ -173,4 +172,18 @@ body.customize-partial-edit-shortcuts-shown .customize-partial-edit-shortcut but
 /*Hiding footer builder pencil icon as we converted section into builder layout, so no longer this needed.*/
 .customize-partial-edit-shortcut-astra-settings-footer-desktop-items > button.customize-partial-edit-shortcut-button {
 	display: none;
+}
+
+.ast-post-banner-highlight:hover {
+	outline: 1px solid #007cba;
+	z-index: 99;
+}
+.ast-post-banner-highlight .banner-editor-shortcut {
+    top: -2px;
+    left: 30px;
+}
+.ast-post-banner-highlight .banner-editor-shortcut > button {
+	box-shadow: unset;
+	border: unset;
+	border-radius: 0 0 0 2px;
 }

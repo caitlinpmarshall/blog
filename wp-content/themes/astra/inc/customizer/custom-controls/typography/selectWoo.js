@@ -1531,8 +1531,8 @@ S2.define('select2/selection/single',[
     $selection.html(
       '<span class="select2-selection__rendered"></span>' +
       '<span class="select2-selection__arrow" role="presentation">' +
-        '<b role="presentation"></b>' +
-      '</span>'
+	  	'<span class="dashicons dashicons-arrow-down-alt2"></span>' +
+	  '</span>'
     );
 
     return $selection;
@@ -1752,6 +1752,7 @@ S2.define('select2/selection/multiple',[
       }
 
       $selection.text(formatted);
+      $selection.append('<span class="select2-selection__choice__remove" role="presentation" aria-hidden="true">&times; </span>');
       $selection.prop('title', selection.title || selection.text);
 
       $selection.data('data', selection);
